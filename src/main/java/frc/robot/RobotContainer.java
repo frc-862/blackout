@@ -1,63 +1,193 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.Autos;
-import frc.robot.commands.ExampleCommand;
-import frc.robot.subsystems.ExampleSubsystem;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.Collector;
+
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.subsystems.LimelightFront;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.subsystems.Collector.GamePiece;
+// import frc.robot.subsystems.LimelightBack;
+// import frc.robot.subsystems.ServoTurn;
+import frc.robot.subsystems.Wrist;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.AutoAlignConstants;
+import frc.robot.Constants.AutonomousConstants;
+import frc.robot.Constants.ControllerConstants;
+import frc.robot.commands.AutoBalance;
+import frc.robot.commands.Collect;
+import frc.robot.commands.SwerveDrive;
+import frc.robot.commands.HoldPower;
+import frc.robot.commands.SafeToScoreLED;
+import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.LEDs;
+import frc.thunder.LightningContainer;
+import frc.robot.Constants.LimelightConstants;
+import frc.thunder.auto.Autonomous;
+import frc.thunder.auto.AutonomousCommandFactory;
+import frc.thunder.pathplanner.com.pathplanner.lib.PathConstraints;
+import frc.thunder.testing.SystemTest;
 
-/**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
- * subsystems, commands, and trigger mappings) should be declared here.
- */
-public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+public class RobotContainer extends LightningContainer {
 
-  // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController =
-      new CommandXboxController(OperatorConstants.kDriverControllerPort);
+    private static final LimelightFront frontLimelight = new LimelightFront(LimelightConstants.FRONT_NAME, LimelightConstants.FRONT_POSE);
+    // private static final LimelightBack backLimelight = new LimelightBack(LimelightConstants.BACK_NAME, LimelightConstants.BACK_POSE);
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  public RobotContainer() {
-    // Configure the trigger bindings
-    configureBindings();
-  }
+    // Creating our main subsystems
+    private static final Drivetrain drivetrain = new Drivetrain(frontLimelight);
+    private static final Wrist wrist = new Wrist();
+    private static final Collector collector = new Collector();
+    private static final LEDs leds = new LEDs(collector);
 
-  /**
-   * Use this method to define your trigger->command mappings. Triggers can be created via the
-   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
-   * predicate, or via the named factories in {@link
-   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
-   * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-   * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-   * joysticks}.
-   */
-  private void configureBindings() {
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    new Trigger(m_exampleSubsystem::exampleCondition)
-        .onTrue(new ExampleCommand(m_exampleSubsystem));
+    // Creates our controllers and deadzones
+    private static final XboxController driver = new XboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
+    private static final XboxController copilot = new XboxController(ControllerConstants.COPILOT_CONTROLLER_PORT);
+    private static final Joystick buttonPad = new Joystick(ControllerConstants.BUTTON_PAD_CONTROLLER_PORT);
 
-    // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
-    // cancelling on release.
-    m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
-  }
+    // creates Autonomous Command
+    private static final AutonomousCommandFactory autoFactory = new AutonomousCommandFactory(drivetrain::getPose, drivetrain::resetOdometry, drivetrain.getDriveKinematics(),
+            AutonomousConstants.DRIVE_PID_CONSTANTS, AutonomousConstants.THETA_PID_CONSTANTS, AutonomousConstants.POSE_PID_CONSTANTS, drivetrain::setStates, drivetrain::resetNeoAngle, drivetrain);
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
-    return Autos.exampleAuto(m_exampleSubsystem);
-  }
+    @Override
+    protected void configureButtonBindings() {
+        /* driver Controls */
+        // RESETS
+        new Trigger(() -> (driver.getBackButton() && driver.getStartButton())).onTrue(new InstantCommand(drivetrain::zeroHeading, drivetrain)); // Resets Forward to be the direction the robot is facing
+
+        new Trigger(driver::getAButton).onTrue(new InstantCommand(drivetrain::resetNeoAngle)); // REsyncs the NEOs relative encoder to the absolute encoders on the swerve modules
+
+        // Flips modules 180 degrees to fix a module that is facing the wrong way on startup
+        new Trigger(() -> driver.getPOV() == 0).onTrue(new InstantCommand(drivetrain::flipFR, drivetrain));
+        new Trigger(() -> driver.getPOV() == 180).onTrue(new InstantCommand(drivetrain::flipBL, drivetrain));
+        new Trigger(() -> driver.getPOV() == 90).onTrue(new InstantCommand(drivetrain::flipBR, drivetrain));
+        new Trigger(() -> driver.getPOV() == 270).onTrue(new InstantCommand(drivetrain::flipFL, drivetrain));
+
+        // GAME PIECE SET
+        new Trigger(driver::getRightBumper).onTrue(new InstantCommand(() -> collector.setGamePiece(GamePiece.CONE)));
+        new Trigger(driver::getLeftBumper).onTrue(new InstantCommand(() -> collector.setGamePiece(GamePiece.CUBE)));
+
+        // new Trigger(driver::getYButton).onTrue(new InstantCommand(() -> drivetrain.moveToDesiredPose(autoFactory), drivetrain)).onFalse(new InstantCommand(drivetrain::stop, drivetrain));
+        // new Trigger(driver::getYButton).whileTrue(new SingleSubstationAlign(drivetrain, frontLimelight, collector));
+        // new Trigger(driver::getYButton).whileTrue(new SingleSubstationAlign(drivetrain, frontLimelight));
+
+        // SET DRIVE PODS TO 45
+        new Trigger(driver::getXButton).whileTrue(new RunCommand(() -> drivetrain.stop(), drivetrain)); // Locks wheels to prevent sliding especially once balanced
+
+        //AUTO ALIGN
+        new Trigger(() -> buttonPad.getRawButton(1)).onTrue(new InstantCommand(() -> drivetrain.setDesiredPose(AutoAlignConstants.BluePoints.SLOT_1_POSE)));
+        new Trigger(() -> buttonPad.getRawButton(2)).onTrue(new InstantCommand(() -> drivetrain.setDesiredPose(AutoAlignConstants.BluePoints.SLOT_2_POSE)));
+        new Trigger(() -> buttonPad.getRawButton(3)).onTrue(new InstantCommand(() -> drivetrain.setDesiredPose(AutoAlignConstants.BluePoints.SLOT_3_POSE)));
+        new Trigger(() -> buttonPad.getRawButton(4)).onTrue(new InstantCommand(() -> drivetrain.setDesiredPose(AutoAlignConstants.BluePoints.SLOT_4_POSE)));
+        new Trigger(() -> buttonPad.getRawButton(5)).onTrue(new InstantCommand(() -> drivetrain.setDesiredPose(AutoAlignConstants.BluePoints.SLOT_5_POSE)));
+        new Trigger(() -> buttonPad.getRawButton(6)).onTrue(new InstantCommand(() -> drivetrain.setDesiredPose(AutoAlignConstants.BluePoints.SLOT_6_POSE)));
+        new Trigger(() -> buttonPad.getRawButton(7)).onTrue(new InstantCommand(() -> drivetrain.setDesiredPose(AutoAlignConstants.BluePoints.SLOT_7_POSE)));
+        new Trigger(() -> buttonPad.getRawButton(8)).onTrue(new InstantCommand(() -> drivetrain.setDesiredPose(AutoAlignConstants.BluePoints.SLOT_8_POSE)));
+        new Trigger(() -> buttonPad.getRawButton(9)).onTrue(new InstantCommand(() -> drivetrain.setDesiredPose(AutoAlignConstants.BluePoints.SLOT_9_POSE)));
+        new Trigger(() -> buttonPad.getRawButton(12)).onTrue(new InstantCommand(() -> drivetrain.setDesiredPose(AutoAlignConstants.BluePoints.SLOT_10_POSE)));
+
+                
+        //cubego(Devin Cube Allign)
+        // new Trigger(driver::getYButton).onTrue(new Cubego(drivetrain));
+        // SERVO
+        new Trigger(driver::getStartButton).onTrue(new InstantCommand(servoturn::flickServo)); // For testing Servo in the pits
+
+        new Trigger(driver::getBButton).onTrue(new InstantCommand(() -> lift.switchVertical()));
+        
+        // AutoAlign based on cone or cube
+        // new Trigger(driver::getBButton).whileTrue(new ConditionalCommand(new AprilTagLineUp(drivetrain, frontLimelight), new RetroLineUp(drivetrain, frontLimelight, collector),
+        //         () -> collector.getGamePiece() == GamePiece.CUBE)); // WorKS but is slow
+
+        // new Trigger(driver::getBButton).whileTrue(new CubeAlign(drivetrain, frontLimelight, servoturn, lift, leds, arm, collector, -1));
+        //AUTOBALANCE
+        new Trigger(driver::getBButton).whileTrue(new AutoBalance(drivetrain)); // FOR TESTING
+
+        /* copilot controls */
+        
+
+        //SETPOINTS
+        // new Trigger(copilot::getRightBumper).onTrue(new DoubleSubstationCollect(lift)); 
+        
+        //FLICK
+        // new Trigger(() -> -copilot.getLeftY() > 0.25).onTrue(new InstantCommand(() -> wrist.setAngle(Rotation2d.fromDegrees(150))));
+        // new Trigger(() -> -copilot.getLeftY() < -0.25).onTrue(new InstantCommand(() -> wrist.setAngle(Rotation2d.fromDegrees(10))));
+
+        //BREAK
+        // new Trigger(copilot::getRightStickButton).onTrue(new InstantCommand(lift::breakLift)); // Breaks out of current goal state and sets itself to onTarget so it can go to a new State
+
+        //DISABLE LIFT
+        // new Trigger(() -> copilot.getStartButton() && copilot.getBackButton())
+        //         .onTrue(new SequentialCommandGroup(new InstantCommand(wrist::disableWrist), new InstantCommand(arm::disableArm), new InstantCommand(elevator::disableEle)));
+    }
+
+    // Creates the autonomous commands
+    @Override
+    protected void configureAutonomousCommands() {
+        //EXAMPLE
+        // autoFactory.makeTrajectory("NAME", Maps.getPathMap(drivetrain, servoturn, lift, collector, leds, arm),
+        //         new PathConstraints(AutonomousConstants.MAX_VELOCITY, AutonomousConstants.MAX_ACCELERATION));
+
+        
+        //ANYWHERE
+        Autonomous.register("ruh roh flick auto", new InstantCommand()); // Emergency Auton that doesn't drive
+    }
+
+    @Override
+    protected void configureDefaultCommands() {
+        /*
+         * Set up the default command for the drivetrain. The controls are for field-oriented driving: Left
+         * stick Y axis -> forward and backwards movement Left stick X axis -> left and right movement Right
+         * stick X axis -> rotation
+         */
+        drivetrain.setDefaultCommand(new SwerveDrive(drivetrain, () -> MathUtil.applyDeadband(driver.getLeftX(), ControllerConstants.DEADBAND),
+                () -> MathUtil.applyDeadband(driver.getLeftY(), ControllerConstants.DEADBAND), () -> MathUtil.applyDeadband(-driver.getRightX(), ControllerConstants.DEADBAND),
+                () -> driver.getRightTriggerAxis() > 0.25, () -> driver.getLeftTriggerAxis() > 0.25));
+
+        leds.setDefaultCommand(new SafeToScoreLED(leds, drivetrain, collector)); // Changes LED color to RED when the arm will not hit when deploying 
+
+        collector.setDefaultCommand(new HoldPower(collector, () -> MathUtil.applyDeadband(copilot.getRightTriggerAxis(), ControllerConstants.DEADBAND) 
+        - MathUtil.applyDeadband(copilot.getLeftTriggerAxis(), ControllerConstants.DEADBAND), driver, copilot, lift));
+
+        // collector.setDefaultCommand(new Collect(collector, () -> MathUtil.applyDeadband(copilot.getRightTriggerAxis(), ControllerConstants.DEADBAND) - MathUtil.applyDeadband(copilot.getLeftTriggerAxis(), ControllerConstants.DEADBAND)));
+
+    }
+
+    @Override
+    protected void configureSystemTests() {}
+
+    @Override
+    protected void releaseDefaultCommands() {}
+
+    @Override
+    protected void initializeDashboardCommands() {}
+
+    @Override
+    protected void configureFaultCodes() {}
+
+    @Override
+    protected void configureFaultMonitors() {}
+
+    @Override
+    protected AutonomousCommandFactory getCommandFactory() {
+        return autoFactory;
+    }
+
+
+    /* Hello this is your favorite programing monster
+     * 
+     * I haunt your code and your dreams, you wont sleep at night while thinking about 
+     * the code issues you've been having. 
+     * 
+     * have fun
+     * 
+     * bu bye >:)
+     */
+
+
+
+
 }
