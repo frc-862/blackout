@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.CollectorConstants;
-import frc.robot.Constants.LiftConstants.LiftState;
 import frc.robot.subsystems.Collector;
 import frc.robot.subsystems.Collector.GamePiece;
 
@@ -46,11 +45,7 @@ public class HoldPower extends CommandBase {
             if(collector.getGamePiece() == GamePiece.CUBE){ // If the collector is holding a cube, hold at a lower power
                 power = CollectorConstants.HOLD_POWER_CUBE;
             } else{
-                if(lift.getGoalState() == LiftState.stowed){
-                    power = .35;
-                } else {
                     power = CollectorConstants.HOLD_POWER_CONE;
-                }
             }
         } else {
             power = 0;
