@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.revrobotics.SparkMaxLimitSwitch;
 
 import edu.wpi.first.math.Matrix;
@@ -162,7 +163,7 @@ public final class Constants {
         public static final double HOLD_POWER_CUBE = 0.25;
         public static final double HOLD_POWER_CONE = 0.65;
         public static final MotorType MOTOR_TYPE = MotorType.kBrushless;
-        public static final IdleMode NEUTRAL_MODE = IdleMode.kBrake;
+        public static final NeutralMode NEUTRAL_MODE = NeutralMode.Brake;
 
         public static final double STALL_POWER = 35d; // Used to detect wether or not the collector is stalling meaning it has a game piece
 

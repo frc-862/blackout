@@ -1,6 +1,9 @@
 package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.MathUtil;
@@ -10,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.CollectorConstants;
 import frc.robot.Constants.RobotMap.*;
+import frc.thunder.config.FalconConfig;
 import frc.thunder.config.NeoConfig;
 import frc.thunder.shuffleboard.LightningShuffleboard;
 import frc.thunder.shuffleboard.LightningShuffleboardPeriodic;
@@ -19,7 +23,7 @@ import frc.thunder.shuffleboard.LightningShuffleboardPeriodic;
  */
 public class Collector extends SubsystemBase {
     // The collector motor
-    private CANSparkMax motor;
+    private TalonFX motor;
 
     // The color sensor
 
@@ -37,9 +41,8 @@ public class Collector extends SubsystemBase {
 
     public Collector() {
         // Create the motor and configure it
-        motor = NeoConfig.createMotor(CAN.COLLECTOR_MOTOR, CollectorConstants.MOTOR_INVERT, CollectorConstants.CURRENT_LIMIT, Constants.VOLTAGE_COMPENSATION, CollectorConstants.MOTOR_TYPE,
-                CollectorConstants.NEUTRAL_MODE);
-        motor = 
+        motor = FalconConfig.createMotor(CAN.COLLECTOR_MOTOR, CollectorConstants.MOTOR_INVERT, CollectorConstants.CURRENT_LIMIT, CollectorConstants.CURRENT_LIMIT, CollectorConstants.NEUTRAL_MODE);
+
         // Initialize the shuffleboard values and start logging data
         initialiizeShuffleboard();
 
@@ -47,20 +50,15 @@ public class Collector extends SubsystemBase {
     }
 
     public void runCollector(double power) {
-        motor.set(power);
+        motor.set(TalonFXControlMode.PercentOutput, power);
     }
 
     // Method to start logging
     @SuppressWarnings("unchecked")
     private void initialiizeShuffleboard() {
         periodicShuffleboard = new LightningShuffleboardPeriodic("Collector", CollectorConstants.LOG_PERIOD,
-            new Pair<String, Object>("Collector motor temperature", (DoubleSupplier) () -> motor.getMotorTemperature()),
+            new Pair<String, Object>("Collector motor output percent", (DoubleSupplier) () -> motor.getMotorOutputPercent()));
             // new Pair<String, Object>("Collector motor controller input voltage", (DoubleSupplier) () -> motor.getBusVoltage()),
-            new Pair<String, Object>("Collector motor controller output (amps)", (DoubleSupplier) () -> motor.getOutputCurrent()),
-            new Pair<String, Object>("faults", (DoubleSupplier) () -> (double) motor.getFaults()),
-            new Pair<String, Object>("collector rpm", (DoubleSupplier) () -> (double) motor.getEncoder().getVelocity()));
-            // new Pair<String, Object>("Collector motor controller output (volts)", (DoubleSupplier) () -> motor.getAppliedOutput());
-
     }
 
     /**
@@ -69,7 +67,7 @@ public class Collector extends SubsystemBase {
      */
     public void setCurrentLimit(int currentLimit) {
         if(currentLimit != currCurrentLimit) {
-            motor.setSmartCurrentLimit(currentLimit);
+            motor.configSupplyCurrentLimit(currentLimit);
         }
         currCurrentLimit = currentLimit;        
     }
