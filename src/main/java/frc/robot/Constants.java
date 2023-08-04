@@ -48,6 +48,11 @@ public final class Constants {
 
     public static final double COMP_LOG_PERIOD = .33;
 
+    // Enum of possible game pieces
+    public enum GamePiece {
+        CONE, CUBE, NONE
+    }
+
     // Constants for xbox controlers
     public static final class ControllerConstants {
         // Ports for the controllers
@@ -158,14 +163,19 @@ public final class Constants {
 
 
     public static final class CollectorConstants {
-        public static final boolean MOTOR_INVERT = false;
-        public static final int CURRENT_LIMIT = 30;
+        public static final boolean INSIDE_MOTOR_INVERT = false;
+        public static final boolean OUTSIDE_MOTOR_INVERT = false;
+
+        public static final int SUPPLY_CURRENT_LIMIT = 40;
+        public static final int STATOR_CURRENT_LIMIT = 30;
+
         public static final double HOLD_POWER_CUBE = 0.25;
         public static final double HOLD_POWER_CONE = 0.65;
         public static final MotorType MOTOR_TYPE = MotorType.kBrushless;
         public static final NeutralMode NEUTRAL_MODE = NeutralMode.Brake;
 
         public static final double STALL_POWER = 35d; // Used to detect wether or not the collector is stalling meaning it has a game piece
+        //TODO Test Amount ^
 
         public static final double LOG_PERIOD = 0.22;
 
@@ -173,21 +183,18 @@ public final class Constants {
         // public enum GamePiece {
         //     CONE, CUBE, NONE
         // }
-
-        //TODO: tune these
-        //Cube Theoretical: #3a01b2 (58, 1, 178)
-        public static final Color CUBE_OPTIMAL = new Color(58, 1, 178);
-        //Cone Theretical: #cb6200 (203,98,0)
-        public static final Color CONE_OPTIMAL = new Color(203, 98, 0);
     }
 
     public static final class WristConstants {
 
         // Motor configuration constants
-        public static final boolean MOTOR_INVERT = true;
-        public static final int CURRENT_LIMIT = 40;
-        public static final MotorType MOTOR_TYPE = MotorType.kBrushless;
-        public static final IdleMode NEUTRAL_MODE = IdleMode.kBrake;
+        public static final boolean RIGHT_MOTOR_INVERT = true; // TODO Check
+        public static final boolean LEFT_MOTOR_INVERT = true; // TODO Check
+
+        public static final int SUPPLY_CURRENT_LIMIT = 40;
+        public static final int STATOR_CURRENT_LIMIT = 40;
+
+        public static final NeutralMode NEUTRAL_MODE = NeutralMode.Brake;
 
         // PID gains for our wrist going up and down
         public static final double UP_kP = 0.0079d;
@@ -252,10 +259,12 @@ public final class Constants {
             public static final int BACK_LEFT_CANCODER = 34;
 
             // COLLECTOR
-            public static final int COLLECTOR_MOTOR = 12;
+            public static final int INSIDE_COLLECTOR_MOTOR = 12; // TODO get Real
+            public static final int OUTSIDE_COLLECTOR_MOTOR = 9; // TODO GET REAL
 
             // WRIST
-            public static final int WRIST_MOTOR = 11;
+            public static final int RIGHT_WRIST_MOTOR = 11; // TODO get Real
+            public static final int LEFT_WRIST_MOTOR = 10; // TODO get Real
 
             // CANdle
             public static final int CANDLE = 22;
@@ -263,10 +272,6 @@ public final class Constants {
 
         public static final class PWM {
             public static final int SERVO = 0;
-        }
-
-        public static final class i2c { //Lowercase to avoid conflict with wpilib's I2C class
-            public static final I2C.Port COLOR_SENSOR = I2C.Port.kMXP;
         }
     }
 

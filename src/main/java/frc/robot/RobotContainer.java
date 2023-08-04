@@ -11,14 +11,13 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.LimelightFront;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.subsystems.Collector.GamePiece;
-// import frc.robot.subsystems.LimelightBack;
 // import frc.robot.subsystems.ServoTurn;
 import frc.robot.subsystems.Wrist;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoAlignConstants;
 import frc.robot.Constants.AutonomousConstants;
 import frc.robot.Constants.ControllerConstants;
+import frc.robot.Constants.GamePiece;
 import frc.robot.commands.AutoBalance;
 import frc.robot.commands.Collect;
 import frc.robot.commands.SwerveDrive;
@@ -30,8 +29,6 @@ import frc.thunder.LightningContainer;
 import frc.robot.Constants.LimelightConstants;
 import frc.thunder.auto.Autonomous;
 import frc.thunder.auto.AutonomousCommandFactory;
-import frc.thunder.pathplanner.com.pathplanner.lib.PathConstraints;
-import frc.thunder.testing.SystemTest;
 
 public class RobotContainer extends LightningContainer {
 
@@ -71,33 +68,29 @@ public class RobotContainer extends LightningContainer {
         new Trigger(driver::getRightBumper).onTrue(new InstantCommand(() -> collector.setGamePiece(GamePiece.CONE)));
         new Trigger(driver::getLeftBumper).onTrue(new InstantCommand(() -> collector.setGamePiece(GamePiece.CUBE)));
 
-        // new Trigger(driver::getYButton).onTrue(new InstantCommand(() -> drivetrain.moveToDesiredPose(autoFactory), drivetrain)).onFalse(new InstantCommand(drivetrain::stop, drivetrain));
-        // new Trigger(driver::getYButton).whileTrue(new SingleSubstationAlign(drivetrain, frontLimelight, collector));
-        // new Trigger(driver::getYButton).whileTrue(new SingleSubstationAlign(drivetrain, frontLimelight));
-
         // SET DRIVE PODS TO 45
         new Trigger(driver::getXButton).whileTrue(new RunCommand(() -> drivetrain.stop(), drivetrain)); // Locks wheels to prevent sliding especially once balanced
         
-        // new Trigger(driver::getBButton).whileTrue(new CubeAlign(drivetrain, frontLimelight, servoturn, lift, leds, arm, collector, -1));
         //AUTOBALANCE
         new Trigger(driver::getBButton).whileTrue(new AutoBalance(drivetrain)); // FOR TESTING
 
+
+
         /* copilot controls */
         
-
         //SETPOINTS
         // new Trigger(copilot::getRightBumper).onTrue(new DoubleSubstationCollect(lift)); 
         
-        //FLICK
-        // new Trigger(() -> -copilot.getLeftY() > 0.25).onTrue(new InstantCommand(() -> wrist.setAngle(Rotation2d.fromDegrees(150))));
-        // new Trigger(() -> -copilot.getLeftY() < -0.25).onTrue(new InstantCommand(() -> wrist.setAngle(Rotation2d.fromDegrees(10))));
+        //FLICK TODO FIX
+        new Trigger(() -> -copilot.getLeftY() > 0.25).onTrue(new InstantCommand(() -> wrist.setAngle(150))); 
+        new Trigger(() -> -copilot.getLeftY() < -0.25).onTrue(new InstantCommand(() -> wrist.setAngle(10)));
 
         //BREAK
         // new Trigger(copilot::getRightStickButton).onTrue(new InstantCommand(lift::breakLift)); // Breaks out of current goal state and sets itself to onTarget so it can go to a new State
 
-        //DISABLE LIFT
-        // new Trigger(() -> copilot.getStartButton() && copilot.getBackButton())
-        //         .onTrue(new SequentialCommandGroup(new InstantCommand(wrist::disableWrist), new InstantCommand(arm::disableArm), new InstantCommand(elevator::disableEle)));
+        // DISABLE LIFT
+        new Trigger(() -> copilot.getStartButton() && copilot.getBackButton())
+                .onTrue(new InstantCommand(new InstantCommand(wrist::disableWrist)));
     }
 
     // Creates the autonomous commands
@@ -126,7 +119,7 @@ public class RobotContainer extends LightningContainer {
         leds.setDefaultCommand(new SafeToScoreLED(leds, drivetrain, collector)); // Changes LED color to RED when the arm will not hit when deploying 
 
         collector.setDefaultCommand(new HoldPower(collector, () -> MathUtil.applyDeadband(copilot.getRightTriggerAxis(), ControllerConstants.DEADBAND) 
-        - MathUtil.applyDeadband(copilot.getLeftTriggerAxis(), ControllerConstants.DEADBAND), driver, copilot, lift));
+        - MathUtil.applyDeadband(copilot.getLeftTriggerAxis(), ControllerConstants.DEADBAND), driver, copilot));
 
         // collector.setDefaultCommand(new Collect(collector, () -> MathUtil.applyDeadband(copilot.getRightTriggerAxis(), ControllerConstants.DEADBAND) - MathUtil.applyDeadband(copilot.getLeftTriggerAxis(), ControllerConstants.DEADBAND)));
 

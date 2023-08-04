@@ -7,8 +7,9 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.CollectorConstants;
+import frc.robot.Constants.GamePiece;
 import frc.robot.subsystems.Collector;
-import frc.robot.subsystems.Collector.GamePiece;
+
 
 public class HoldPower extends CommandBase {
     Collector collector;
@@ -24,12 +25,13 @@ public class HoldPower extends CommandBase {
      * @param collector the collector subsystem
      * @param input the input speed for the collector
      */
-    public HoldPower(Collector collector, DoubleSupplier input, XboxController driver, XboxController copilot) {
+    public HoldPower(Collector collector, DoubleSupplier input, XboxController driver,
+            XboxController copilot) {
         this.collector = collector;
         this.input = input;
         this.driver = driver;
         this.copilot = copilot;
-        
+
         addRequirements(collector);
     }
 
@@ -38,29 +40,31 @@ public class HoldPower extends CommandBase {
         if (input.getAsDouble() > 0) { // Collector collects
             doHoldPower = true;
             power = input.getAsDouble();
-        } else if (input.getAsDouble() < 0) { // Collector spits 
+        } else if (input.getAsDouble() < 0) { // Collector spits
             doHoldPower = false;
             power = input.getAsDouble();
         } else if (doHoldPower) { // Hold power if no input and last input was inwards
-            if(collector.getGamePiece() == GamePiece.CUBE){ // If the collector is holding a cube, hold at a lower power
+            if (collector.getGamePiece() == GamePiece.CUBE) { // If the collector is holding a cube,
+                                                              // hold at a lower power
                 power = CollectorConstants.HOLD_POWER_CUBE;
-            } else{
-                    power = CollectorConstants.HOLD_POWER_CONE;
+            } else {
+                power = CollectorConstants.HOLD_POWER_CONE;
             }
         } else {
             power = 0;
         }
 
         if (input.getAsDouble() < 0) {
-            collector.setCurrentLimit(60);
+            collector.setSupplyCurrentLimit(60);
         } else if (input.getAsDouble() > 0 && collector.getGamePiece() == GamePiece.CONE) {
-            collector.setCurrentLimit(50);
+            collector.setSupplyCurrentLimit(50);
         } else {
-            collector.setCurrentLimit(CollectorConstants.CURRENT_LIMIT);
+            collector.setSupplyCurrentLimit(CollectorConstants.STATOR_CURRENT_LIMIT); // TODO Check
+                                                                                      // if correct
         }
 
-        if(DriverStation.isTeleop()) {
-            if(collector.getGamePiece() == GamePiece.CONE){
+        if (DriverStation.isTeleop()) {
+            if (collector.getGamePiece() == GamePiece.CONE) { // TODO See if Nessesary
                 power = -power;
             }
 

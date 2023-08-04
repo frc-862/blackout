@@ -1,21 +1,19 @@
 package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.CollectorConstants;
+import frc.robot.Constants.GamePiece;
 import frc.robot.Constants.RobotMap.*;
 import frc.thunder.config.FalconConfig;
-import frc.thunder.config.NeoConfig;
-import frc.thunder.shuffleboard.LightningShuffleboard;
 import frc.thunder.shuffleboard.LightningShuffleboardPeriodic;
 
 /**
@@ -23,25 +21,25 @@ import frc.thunder.shuffleboard.LightningShuffleboardPeriodic;
  */
 public class Collector extends SubsystemBase {
     // The collector motor
-    private TalonFX motor;
-
-    // The color sensor
+    private TalonFX insideMotor;
+    private TalonFX outsideMotor;
 
     // Periodic Shuffleboard
     private LightningShuffleboardPeriodic periodicShuffleboard;
 
-    private int currCurrentLimit = CollectorConstants.CURRENT_LIMIT;
-
-    // Enum of possible game pieces
-    public enum GamePiece {
-        CONE, CUBE, NONE
-    }
+    private int currSupplyCurrentLimit = CollectorConstants.SUPPLY_CURRENT_LIMIT;
+    private int currStatorCurrentLimit = CollectorConstants.STATOR_CURRENT_LIMIT;
 
     private GamePiece gamePiece = GamePiece.CUBE;
 
     public Collector() {
         // Create the motor and configure it
-        motor = FalconConfig.createMotor(CAN.COLLECTOR_MOTOR, CollectorConstants.MOTOR_INVERT, CollectorConstants.CURRENT_LIMIT, CollectorConstants.CURRENT_LIMIT, CollectorConstants.NEUTRAL_MODE);
+        insideMotor = FalconConfig.createMotor(CAN.INSIDE_COLLECTOR_MOTOR,
+                CollectorConstants.INSIDE_MOTOR_INVERT, CollectorConstants.SUPPLY_CURRENT_LIMIT,
+                CollectorConstants.STATOR_CURRENT_LIMIT, CollectorConstants.NEUTRAL_MODE);
+        outsideMotor = FalconConfig.createMotor(CAN.OUTSIDE_COLLECTOR_MOTOR,
+                CollectorConstants.OUTSIDE_MOTOR_INVERT, CollectorConstants.SUPPLY_CURRENT_LIMIT,
+                CollectorConstants.STATOR_CURRENT_LIMIT, CollectorConstants.NEUTRAL_MODE);
 
         // Initialize the shuffleboard values and start logging data
         initialiizeShuffleboard();
@@ -49,32 +47,79 @@ public class Collector extends SubsystemBase {
         CommandScheduler.getInstance().registerSubsystem(this);
     }
 
-    public void runCollector(double power) {
-        motor.set(TalonFXControlMode.PercentOutput, power);
+    /**
+     * Sets the power of the collector motors
+     * 
+     * @param power the percent speed to set the collector motors to
+     */
+    public void setPower(double power) {
+        insideMotor.set(TalonFXControlMode.PercentOutput, power);
+        outsideMotor.set(TalonFXControlMode.PercentOutput, power);
+    }
+
+    /**
+     * Sets the power of the Inside collector motor
+     * 
+     * @param power the percent speed to set the inside collector motor to
+     */
+    public void setInsidePower(double power) {
+        insideMotor.set(TalonFXControlMode.PercentOutput, power);
+    }
+
+    /**
+     * Sets the power of the Outside collector motor
+     * 
+     * @param power the percent speed to set the outside collector motor to
+     */
+    public void setOutsidePower(double power) {
+        outsideMotor.set(TalonFXControlMode.PercentOutput, power);
     }
 
     // Method to start logging
     @SuppressWarnings("unchecked")
     private void initialiizeShuffleboard() {
         periodicShuffleboard = new LightningShuffleboardPeriodic("Collector", CollectorConstants.LOG_PERIOD,
-            new Pair<String, Object>("Collector motor output percent", (DoubleSupplier) () -> motor.getMotorOutputPercent()));
-            // new Pair<String, Object>("Collector motor controller input voltage", (DoubleSupplier) () -> motor.getBusVoltage()),
+            new Pair<String, Object>("Collector motor output percent", (DoubleSupplier) () -> insideMotor.getMotorOutputPercent()));
     }
 
     /**
-     * Sets smart current limit if its different from the current current limit
-     * @param currentLimit the new smart current limit
+     * Sets supply current limit if its different from the current supply current limit
+     * 
+     * @param supplyCurrentLimit the new smart current limit
      */
-    public void setCurrentLimit(int currentLimit) {
-        if(currentLimit != currCurrentLimit) {
-            motor.configSupplyCurrentLimit(currentLimit);
+    public void setSupplyCurrentLimit(int supplyCurrentLimit) {
+        if (supplyCurrentLimit != currSupplyCurrentLimit) {
+            insideMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true,
+                    supplyCurrentLimit, supplyCurrentLimit, .25), 250);
+            outsideMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true,
+                    supplyCurrentLimit, supplyCurrentLimit, .25), 250);
+            // TODO Threshold needs testing, tigger threshold timer (s) , Timeout for application (ms)
         }
-        currCurrentLimit = currentLimit;        
+        currStatorCurrentLimit = supplyCurrentLimit;
     }
 
-    //Used to check if the collector is stalling. Used to detect if the collector is holding a game piece
-    public boolean isStalling(){
-        return motor.getOutputCurrent() > CollectorConstants.STALL_POWER;
+    /**
+     * Sets stator current limit if its different from the current stator current limit
+     * 
+     * @param statorLimit
+     */
+    public void setStatorCurrentLimit(int statorLimit) {
+        if (statorLimit != currStatorCurrentLimit) {
+            insideMotor.configStatorCurrentLimit(
+                    new StatorCurrentLimitConfiguration(true, statorLimit, statorLimit, .25), 250);
+            outsideMotor.configStatorCurrentLimit(
+                    new StatorCurrentLimitConfiguration(true, statorLimit, statorLimit, .25), 250);
+        }
+        currStatorCurrentLimit = statorLimit;
+    }
+
+
+    /**
+     * Returns true if the collector is stalling
+     */
+    public boolean isStalling() {
+        return (insideMotor.getStatorCurrent() > CollectorConstants.STALL_POWER)
+            || (outsideMotor.getStatorCurrent() > CollectorConstants.STALL_POWER); // TODO Test Amount and type Stator vs Supply
     }
 
     /**
@@ -82,7 +127,6 @@ public class Collector extends SubsystemBase {
      * 
      * @return the game piece detected by the color sensor (Either CUBE, CONE, or NONE)
      */
-
     public GamePiece getGamePiece() {
         return gamePiece;
     }
@@ -92,19 +136,6 @@ public class Collector extends SubsystemBase {
         this.gamePiece = gamePiece;
     }
 
-    /**
-     * Sets the power of the collector motor
-     * 
-     * @param power the percent speed to set the elevator motor to
-     */
-    public void setPower(double power) {
-        if(getGamePiece() == GamePiece.CONE) {
-            motor.set(MathUtil.clamp(power, -1, 1));
-        } else {
-            motor.set(power);
-        }
-    }
-    
     /**
      * stop Sets the power of the collector motor to 0
      */

@@ -56,7 +56,7 @@ public class SwerveDrive extends CommandBase {
 
         if (slowMode.getAsBoolean()) { // Works switch back from Commented to 3 lines uncommented inside if statement
             // if(!drivetrain.isInLoadZone()) { // Was removed because the driver wanted a consistant speed in slow Mode  
-            //     leftX = m_translationXSupplier.getAsDouble() * DrivetrainConstants.SLOW_MODE_TRANSLATIONAL_MULT;
+                // leftX = m_translationXSupplier.getAsDouble() * DrivetrainConstants.SLOW_MODE_TRANSLATIONAL_MULT;
             //     leftY = m_translationYSupplier.getAsDouble() * DrivetrainConstants.SLOW_MODE_TRANSLATIONAL_MULT;
             //     rightX = m_rotationSupplier.getAsDouble() * DrivetrainConstants.SLOW_MODE_ROTATIONAL_MULT;
             // } else {

@@ -5,9 +5,10 @@ import com.ctre.phoenix.led.CANdleConfiguration;
 import com.ctre.phoenix.led.CANdle.VBatOutputMode;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.GamePiece;
 import frc.robot.Constants.LedConstants;
 import frc.robot.Constants.RobotMap.CAN;
-import frc.robot.subsystems.Collector.GamePiece;
+
 
 public class LEDs extends SubsystemBase {
     private CANdle leds = new CANdle(CAN.CANDLE);
