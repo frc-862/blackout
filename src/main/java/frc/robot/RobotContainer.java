@@ -21,6 +21,8 @@ import frc.robot.Constants.GamePiece;
 import frc.robot.commands.AutoBalance;
 import frc.robot.commands.Collect;
 import frc.robot.commands.SwerveDrive;
+import frc.robot.commands.Tests.Collector.CollectorTest;
+import frc.robot.commands.Tests.Drive.DriveTrainSystemTest;
 import frc.robot.commands.HoldPower;
 import frc.robot.commands.SafeToScoreLED;
 import frc.robot.subsystems.Drivetrain;
@@ -29,6 +31,7 @@ import frc.thunder.LightningContainer;
 import frc.robot.Constants.LimelightConstants;
 import frc.thunder.auto.Autonomous;
 import frc.thunder.auto.AutonomousCommandFactory;
+import frc.thunder.testing.SystemTest;
 
 public class RobotContainer extends LightningContainer {
 
@@ -90,7 +93,7 @@ public class RobotContainer extends LightningContainer {
 
         // DISABLE LIFT
         new Trigger(() -> copilot.getStartButton() && copilot.getBackButton())
-                .onTrue(new InstantCommand(new InstantCommand(wrist::disableWrist)));
+            .onTrue(new InstantCommand(wrist::disableWrist));
     }
 
     // Creates the autonomous commands
@@ -126,7 +129,14 @@ public class RobotContainer extends LightningContainer {
     }
 
     @Override
-    protected void configureSystemTests() {}
+    protected void configureSystemTests() {
+        SystemTest.registerTest("fl drive test" , new DriveTrainSystemTest(drivetrain, drivetrain.getFrontLeftModule(), 0.25));
+        SystemTest.registerTest("fr drive test" , new DriveTrainSystemTest(drivetrain, drivetrain.getFrontRightModule(), 0.25));
+        SystemTest.registerTest("bl drive test" , new DriveTrainSystemTest(drivetrain, drivetrain.getBackLeftModule(), 0.25));
+        SystemTest.registerTest("br drive test" , new DriveTrainSystemTest(drivetrain, drivetrain.getBackRightModule(), 0.25));
+
+        SystemTest.registerTest("Collector test", new CollectorTest(collector, 1d));
+    }
 
     @Override
     protected void releaseDefaultCommands() {}

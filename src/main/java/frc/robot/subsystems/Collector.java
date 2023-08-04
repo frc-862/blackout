@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
@@ -134,6 +135,16 @@ public class Collector extends SubsystemBase {
     // For the driver to set the game piece manually
     public void setGamePiece(GamePiece gamePiece) {
         this.gamePiece = gamePiece;
+    }
+
+    public void setCoastMode() {
+        insideMotor.setNeutralMode(NeutralMode.Coast);
+        outsideMotor.setNeutralMode(NeutralMode.Coast);
+    }
+
+    public void setBrakeMode() {
+        insideMotor.setNeutralMode(NeutralMode.Brake);
+        outsideMotor.setNeutralMode(NeutralMode.Brake);
     }
 
     /**
