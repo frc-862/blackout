@@ -3,7 +3,7 @@ package frc.robot;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-
+import java.util.HashMap;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
@@ -19,11 +19,9 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.I2C;
-import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.thunder.math.InterpolationMap;
 import frc.thunder.pathplanner.com.pathplanner.lib.auto.PIDConstants;
-import frc.thunder.swervelib.SdsModuleConfigurations;
 
 /**
  * Class to hold all of the constants for the robot
@@ -37,7 +35,7 @@ public final class Constants {
     public static final Path BLACKOUT_PATH = Paths.get("home/lvuser/blackout");
 
     // Check if we're on blackout
-    public static final boolean isBlackout() {
+    public static final boolean isBlackout() { // MAKE DEFAULT?
         return BLACKOUT_PATH.toFile().exists();
     }
 
@@ -138,14 +136,13 @@ public final class Constants {
             public static final class Gridlock {
                 public static final double FRONT_LEFT_STEER_OFFSET = -Math.toRadians(193.535);
                 public static final double FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(145.547);
-                // public static final double BACK_LEFT_STEER_OFFSET = -Math.toRadians(198.721);
                 public static final double BACK_LEFT_STEER_OFFSET = -Math.toRadians(199.688);
                 public static final double BACK_RIGHT_STEER_OFFSET = -Math.toRadians(210.938);
             }
 
             // Blackouts swerve module absolute encoder offsets
-            public static final class Blackout {
-                public static final double FRONT_LEFT_STEER_OFFSET = -Math.toRadians(253.916);
+            public static final class Blackout { // TODO Need offsets
+                public static final double FRONT_LEFT_STEER_OFFSET = -Math.toRadians(253.916); 
                 public static final double FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(222.451);
                 public static final double BACK_LEFT_STEER_OFFSET = -Math.toRadians(19.688);
                 public static final double BACK_RIGHT_STEER_OFFSET = -Math.toRadians(63.018);
@@ -155,9 +152,7 @@ public final class Constants {
 
     public static final class LimelightConstants {
         public static final String FRONT_NAME = "limelight-front";
-        public static final String BACK_NAME = "limelight-back";
         public static final Pose3d FRONT_POSE = new Pose3d(.1, 0.28, 0.72, new Rotation3d(0, 0, 0)); // Position on robot
-        public static final Pose3d BACK_POSE = new Pose3d(.1, 0.28, 0.83, new Rotation3d(0, 10, 180)); // Position on robot
         public static final double CUBE_OFFSET = 0.0; // TODO find this value
     }
 
@@ -178,11 +173,6 @@ public final class Constants {
         //TODO Test Amount ^
 
         public static final double LOG_PERIOD = 0.22;
-
-        // // Enum of possible game pieces
-        // public enum GamePiece {
-        //     CONE, CUBE, NONE
-        // }
     }
 
     public static final class WristConstants {
@@ -405,5 +395,20 @@ public final class Constants {
 
         //Log period auto align
         public static final double LOG_PERIOD = 0.25;
+    }
+
+    public static final class WristAngles {
+        public static final HashMap <String, Double> wristAngle() {
+            HashMap<String, Double> angleMap = new HashMap<>();
+            angleMap.put("High-Score-Cube", 0d);
+            angleMap.put("Mid-Score-Cube", 0d);
+            angleMap.put("Low-Score-Cube", 0d);
+            angleMap.put("Ground-Collect-Cube", 0d);
+            return angleMap;
+        }
+
+        public static enum wristStates {
+            groundCube, LowCube, MidCube, HighCube, stow
+        }
     }
 }

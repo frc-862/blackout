@@ -21,6 +21,7 @@ import frc.robot.Constants.GamePiece;
 import frc.robot.commands.AutoBalance;
 import frc.robot.commands.Collect;
 import frc.robot.commands.SwerveDrive;
+import frc.robot.commands.wristState;
 import frc.robot.commands.Tests.Collector.CollectorTest;
 import frc.robot.commands.Tests.Drive.DriveTrainSystemTest;
 import frc.robot.commands.HoldPower;
@@ -82,7 +83,7 @@ public class RobotContainer extends LightningContainer {
         /* copilot controls */
         
         //SETPOINTS
-        // new Trigger(copilot::getRightBumper).onTrue(new DoubleSubstationCollect(lift)); 
+        // new Trigger(copilot::getRightBumper).onTrue(); 
         
         //FLICK TODO FIX
         new Trigger(() -> -copilot.getLeftY() > 0.25).onTrue(new InstantCommand(() -> wrist.setAngle(150))); 
@@ -110,6 +111,8 @@ public class RobotContainer extends LightningContainer {
 
     @Override
     protected void configureDefaultCommands() {
+        wrist.setDefaultCommand(new wristState(wrist));
+
         /*
          * Set up the default command for the drivetrain. The controls are for field-oriented driving: Left
          * stick Y axis -> forward and backwards movement Left stick X axis -> left and right movement Right

@@ -30,7 +30,7 @@ public class Wrist extends SubsystemBase {
     }
 
     public void setAngle(double angle) {
-
+        
     }
 
     public void disableWrist() {
