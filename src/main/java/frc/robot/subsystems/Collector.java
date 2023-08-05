@@ -1,11 +1,8 @@
 package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
-import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -58,8 +55,10 @@ public class Collector extends SubsystemBase {
      * @param power the percent speed to set the collector motors to
      */
     public void setPercentPower(double power) {
-        insideMotor.set(TalonFXControlMode.PercentOutput, power);
-        outsideMotor.set(TalonFXControlMode.PercentOutput, power);
+        // insideMotor.setVelocity(power);
+        // outsideMotor.set(TalonFXControlMode.PercentOutput, power);
+        insideMotor.setVelocity(power);
+        
     }
 
     /**
@@ -106,9 +105,9 @@ public class Collector extends SubsystemBase {
     public void setSupplyCurrentLimit(int supplyCurrentLimit) {
         if (supplyCurrentLimit != currSupplyCurrentLimit) {
             insideMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true,
-                    supplyCurrentLimit, supplyCurrentLimit, .25), 250);
+                    supplyCurrentLimit, supplyCurrentLimit, .25), 10);
             outsideMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true,
-                    supplyCurrentLimit, supplyCurrentLimit, .25), 250);
+                    supplyCurrentLimit, supplyCurrentLimit, .25), 10);
             // TODO Threshold needs testing, tigger threshold timer (s) , Timeout for application (ms)
         }
         currStatorCurrentLimit = supplyCurrentLimit;
@@ -153,21 +152,25 @@ public class Collector extends SubsystemBase {
     }
 
     public void setCoastMode() {
-        insideMotor.setNeutralMode(NeutralMode.Coast);
-        outsideMotor.setNeutralMode(NeutralMode.Coast);
+        insideMotor.setNeutralMode(NeutralModeValue.Coast);
+        outsideMotor.setNeutralMode(NeutralModeValue.Coast);
     }
 
     public void setBrakeMode() {
-        insideMotor.setNeutralMode(NeutralMode.Brake);
-        outsideMotor.setNeutralMode(NeutralMode.Brake);
+        insideMotor.setNeutralMode(NeutralModeValue.Brake);
+        outsideMotor.setNeutralModeValue(NeutralModeValue.Brake);
     }
 
     public double currentEncoderTicks(TalonFX motor) {
 		return motor.getSelectedSensorPosition();
 	}
 
-    public double getCurrentRPM(TalonFX motor) {
-		return motor.getSelectedSensorVelocity() / 2048 * 600; //converts from revs per second to revs per minute
+    // public double getCurrentRPM(TalonFX motor) {
+	// 	return motor.getSelectedSensorVelocity() / 2048 * 600; //converts from revs per second to revs per minute
+	// }
+
+    public double getCurrentRPM() {
+		return (insideMotor.getSelectedSensorVelocity() + outsideMotor.getSelectedSensorVelocity()) / 2 / 2048 * 600; //converts from revs per second to revs per minute
 	}
 
     private void configPIDGains(TalonFX motor, double kP, double kI, double kD, double kV) {
@@ -199,8 +202,7 @@ public class Collector extends SubsystemBase {
         outsideMotor.config_kP(0, LightningShuffleboard.getDouble("Collector", "OUTSIDE_kD", CollectorConstants.INSIDE_kD));
         outsideMotor.config_kP(0, LightningShuffleboard.getDouble("Collector", "OUTSIDE_kF", CollectorConstants.INSIDE_kF));
 
-        LightningShuffleboard.setDouble("Collector", "INSIDE_RPM", getCurrentRPM(insideMotor));
-        LightningShuffleboard.setDouble("Collector", "OUTSIDE_RPM", getCurrentRPM(outsideMotor));
+        LightningShuffleboard.setDouble("Collector", "INSIDE_RPM", getCurrentRPM());
 
         LightningShuffleboard.setDouble("Collector", "INSIDE_Ticks", currentEncoderTicks(insideMotor));
         LightningShuffleboard.setDouble("Collector", "OUTSIDE_Ticks", currentEncoderTicks(outsideMotor));

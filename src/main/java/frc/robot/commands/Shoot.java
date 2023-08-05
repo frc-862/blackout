@@ -1,8 +1,8 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.CollectorConstants;
 import frc.robot.Constants.WristAngles;
-import frc.robot.Constants.WristAngles.wristStates;
 import frc.robot.subsystems.Collector;
 import frc.robot.subsystems.Wrist;
 
@@ -22,18 +22,15 @@ public class Shoot extends CommandBase {
 	// Called when the command is initially scheduled.
 	@Override
 	public void initialize() {
-		if(wrist.getGoalState() == wrist.getCurrState()) {
-			if(wrist.getCurrState() == wristStates.Stow) {
-				//TODO what to do when we are stowed
-			} else {
-				targetRPM = WristAngles.shootSpeedMap().get(wrist.getCurrState());
-			}
-		}
+		collector.setPercentPower(-CollectorConstants.HOLD_POWER_CUBE);;
 	}
 
 	@Override
 	public void execute() {
-		collector.setRPM(targetRPM);
+		if(wrist.getGoalState() == wrist.getCurrState()) {
+			targetRPM = WristAngles.shootSpeedMap().get(wrist.getCurrState());
+			collector.setRPM(targetRPM);
+		}
 	}
 
 	@Override
@@ -44,7 +41,6 @@ public class Shoot extends CommandBase {
 	// Returns true when the command should end.
 	@Override
 	public boolean isFinished() {
-		return false; // TODO determine when to end
-		// TIME based, RPM, AMPS?
+		return collector.getCurrentRPM() >= WristAngles.shootSpeedMap().get(wrist.getCurrState());
 	}
 }

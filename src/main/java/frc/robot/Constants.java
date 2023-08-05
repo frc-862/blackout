@@ -8,6 +8,8 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix6.controls.NeutralOut;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.SparkMaxLimitSwitch;
 
 import edu.wpi.first.math.Matrix;
@@ -175,7 +177,7 @@ public final class Constants {
         public static final double HOLD_POWER_CUBE = 0.25;
         public static final double HOLD_POWER_CONE = 0.65;
         public static final MotorType MOTOR_TYPE = MotorType.kBrushless;
-        public static final NeutralMode NEUTRAL_MODE = NeutralMode.Brake;
+        public static final NeutralModeValue NEUTRAL_MODE = NeutralModeValue.Brake;
 
         public static final double STALL_POWER = 35d; // Used to detect wether or not the collector
                                                       // is stalling meaning it has a game piece
@@ -474,6 +476,7 @@ public final class Constants {
 
         public static final HashMap<wristStates, Integer> shootSpeedMap() { // TODO Get Speeds
             HashMap<wristStates, Integer> shootSpeedMap = new HashMap<>();
+            shootSpeedMap.put(wristStates.Stow, -99999);
             shootSpeedMap.put(wristStates.Ground, 0);
             shootSpeedMap.put(wristStates.MidCube, 0);
             shootSpeedMap.put(wristStates.HighCube, 0);
