@@ -6,8 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.ctre.phoenix.led.CANdle.LEDStripType;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
+// import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.SparkMaxLimitSwitch;
@@ -205,7 +204,7 @@ public final class Constants {
         public static final int SUPPLY_CURRENT_LIMIT = 40;
         public static final int STATOR_CURRENT_LIMIT = 40;
 
-        public static final NeutralMode NEUTRAL_MODE = NeutralMode.Brake;
+        public static final NeutralModeValue NEUTRAL_MODE = NeutralModeValue.Brake;
 
         // PID gains for our wrist going up and down
         public static final double UP_kP = 0.0079d;
@@ -333,7 +332,7 @@ public final class Constants {
     // Constants for the LEDs
     public static final class LedConstants {
         public static final double BRIGHTNESS = .25;
-        public static final LEDStripType STRIP_TYPE = LEDStripType.RGB;
+        // public static final LEDStripType STRIP_TYPE = LEDStripType.RGB;
         public static final int LED_LENGTH = 150;
 
         public static enum LEDStates {

@@ -55,10 +55,8 @@ public class Collector extends SubsystemBase {
      * @param power the percent speed to set the collector motors to
      */
     public void setPercentPower(double power) {
-        // insideMotor.setVelocity(power);
-        // outsideMotor.set(TalonFXControlMode.PercentOutput, power);
-        insideMotor.setVelocity(power);
-        
+        insideMotor.set(power);
+        outsideMotor.set(power);
     }
 
     /**
@@ -69,6 +67,7 @@ public class Collector extends SubsystemBase {
     public void setRPM(double RPM) {
         double ticks = (RPM / 600) * 2048;
         insideMotor.set(TalonFXControlMode.Velocity, ticks);
+        insideMotor.setControl(ticks);
         outsideMotor.set(TalonFXControlMode.Velocity, ticks);
     }
 

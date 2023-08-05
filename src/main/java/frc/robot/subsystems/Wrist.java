@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -71,7 +70,7 @@ public class Wrist extends SubsystemBase {
      * @return Rotation2d of the wrist from encoder
      */
     public Rotation2d getAngle() { //TODO FIX
-        return Rotation2d.fromDegrees(MathUtil.inputModulus(leftMotor.getSelectedSensorPosition() * WristConstants.POSITION_CONVERSION_FACTOR - LEFT_OFFSET, -180, 180));
+        return Rotation2d.fromDegrees(MathUtil.inputModulus(leftMotor.getRotorPosition().getValue() * WristConstants.POSITION_CONVERSION_FACTOR - LEFT_OFFSET, -180, 180));
     }
     
     public void disableWrist() {
@@ -84,8 +83,8 @@ public class Wrist extends SubsystemBase {
      * @param power sets power from percent output
      */
     public void setPower(double power) {
-        rightMotor.set(TalonFXControlMode.PercentOutput, power);
-        leftMotor.set(TalonFXControlMode.PercentOutput, power);
+        rightMotor.set(power);
+        leftMotor.set(power);
     }
 
     public void setGoalState(wristStates goalState) {
