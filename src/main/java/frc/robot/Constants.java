@@ -184,15 +184,15 @@ public final class Constants {
 
         public static final double LOG_PERIOD = 0.22;
 
-        public static final double INSIDE_kP = 0.01;
+        public static final double INSIDE_kP = 0.01; // TODO NEED THESE
         public static final double INSIDE_kD = 0.01;
         public static final double INSIDE_kI = 0.01;
-        public static final double INSIDE_kF = 0.01;
+        public static final double INSIDE_FF = 0.01;
 
         public static final double OUTSIDE_kP = 0.01;
         public static final double OUTSIDE_kD = 0.01;
         public static final double OUTSIDE_kI = 0.01;
-        public static final double OUTSIDE_kF = 0.01;
+        public static final double OUTSIDE_FF = 0.01;
     }
 
     public static final class WristConstants {
