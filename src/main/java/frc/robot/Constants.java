@@ -207,10 +207,15 @@ public final class Constants {
 
         // PID gains for our wrist going up and down
         public static final double UP_kP = 0.0079d;
+        public static final double UP_kI = 0.0d;
         public static final double UP_kD = 0.0001d;
+        public static final double UP_F = 0.0d;
+
+
         public static final double DOWN_kP = 0.006d;
+        public static final double DOWN_kI = 0d;
         public static final double DOWN_kD = 0d;
-        public static final double kI = 0d;
+        public static final double DOWN_F = 0d;
 
         // Tolernace for our wrist
         public static final double TOLERANCE = 12d;
@@ -226,9 +231,8 @@ public final class Constants {
         public static final double LOG_PERIOD = 0.24;
 
         // Offsets in degrees
-        public static final double ENCODER_OFFSET_GRIDLOCK = 20.8; // -161.5d;
-
-        public static final double ENCODER_OFFSET_BLACKOUT = -22; // TODO: check this
+        public static final double RIGHT_OFFSET = 0d;
+        public static final double LEFT_OFFSET = 0d;
 
         // Conversion factor for our wrist, multiply this by the navite units to get degrees
         public static final double POSITION_CONVERSION_FACTOR = 360;
@@ -241,6 +245,16 @@ public final class Constants {
 
         // Interpolation map for our arm Feedforward values to make sure we have enough minimum
         // power to move the arm
+        public static InterpolationMap WRIST_KF_MAP = new InterpolationMap() {
+            {
+                put(-90d, 0d);
+                put(-45d, -0.008d);
+                put(0d, 0.017d);
+                put(45d, 0.01d);
+                put(90d, 0d);
+                put(135d, 0.008d);
+            }
+        };
     }
 
 
@@ -457,7 +471,7 @@ public final class Constants {
             angleMap.put(wristStates.HighCube, 0d);
             return angleMap;
         }
-        
+
         public static final HashMap<wristStates, Integer> shootSpeedMap() { // TODO Get Speeds
             HashMap<wristStates, Integer> shootSpeedMap = new HashMap<>();
             shootSpeedMap.put(wristStates.Ground, 0);
