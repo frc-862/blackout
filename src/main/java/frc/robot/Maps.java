@@ -11,7 +11,6 @@ import frc.robot.commands.Collect;
 import frc.robot.commands.HoldPower;
 import frc.robot.subsystems.Collector;
 import frc.robot.subsystems.Drivetrain;
-import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.LimelightFront;
 // import frc.robot.subsystems.ServoTurn;
 import frc.thunder.vision.VisionBase;
@@ -28,11 +27,10 @@ public class Maps {
      * @param servoturn
      * @param lift
      * @param collector
-     * @param leds
      * @return
      */
     public static HashMap<String, Command> getPathMap(Drivetrain drivetrain, Collector collector,
-            LEDs leds, LimelightFront frontLimelight, int cycle) {
+            LimelightFront frontLimelight, int cycle) {
         HashMap<String, Command> eventMap = new HashMap<>();
         // eventMap.put("Score-Piece-Servo", new InstantCommand(servoturn::flickServo, servoturn));
         // // Triggers the servo to drop the cube at the start

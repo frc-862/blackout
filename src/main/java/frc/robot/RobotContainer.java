@@ -24,10 +24,8 @@ import frc.robot.commands.SwerveDrive;
 import frc.robot.commands.Tests.Collector.CollectorTest;
 import frc.robot.commands.Tests.Drive.DriveTrainSystemTest;
 import frc.robot.commands.HoldPower;
-import frc.robot.commands.SafeToScoreLED;
 import frc.robot.commands.Shoot;
 import frc.robot.subsystems.Drivetrain;
-import frc.robot.subsystems.LEDs;
 import frc.thunder.LightningContainer;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.WristAngles.wristStates;
@@ -46,7 +44,6 @@ public class RobotContainer extends LightningContainer {
     private static final Drivetrain drivetrain = new Drivetrain(frontLimelight);
     private static final Wrist wrist = new Wrist();
     private static final Collector collector = new Collector();
-    private static final LEDs leds = new LEDs(collector);
 
     // Creates our controllers and deadzones
     private static final XboxController driver =
@@ -135,11 +132,6 @@ public class RobotContainer extends LightningContainer {
                 () -> driver.getRightTriggerAxis() > 0.25,
                 () -> driver.getLeftTriggerAxis() > 0.25));
 
-        leds.setDefaultCommand(new SafeToScoreLED(leds, drivetrain, collector)); // Changes LED
-                                                                                 // color to RED
-                                                                                 // when the arm
-                                                                                 // will not hit
-                                                                                 // when deploying
 
         collector.setDefaultCommand(new HoldPower(collector,
                 () -> MathUtil.applyDeadband(copilot.getRightTriggerAxis(),
