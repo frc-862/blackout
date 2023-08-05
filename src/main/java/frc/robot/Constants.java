@@ -64,7 +64,7 @@ public final class Constants {
         public static final double MAX_POWER = 1d;
     }
 
-    // Constants for our system tests    
+    // Constants for our system tests
     public static final class SystemTestConstants {
         // Drive Test Variables
         public static final int DEGREES_INTERVAL_INCREASE = 30;
@@ -86,10 +86,15 @@ public final class Constants {
 
         // Our max voltage, velocity, angular velocity, and angular acceleration
         public static final double MAX_VOLTAGE = 12;
-        // public static final double MAX_VELOCITY_METERS_PER_SECOND = 5676.0 / 60.0 * SdsModuleConfigurations.MK4I_L2.getDriveReduction() * SdsModuleConfigurations.MK4I_L2.getWheelDiameter() * Math.PI;
+        // public static final double MAX_VELOCITY_METERS_PER_SECOND = 5676.0 / 60.0 *
+        // SdsModuleConfigurations.MK4I_L2.getDriveReduction() *
+        // SdsModuleConfigurations.MK4I_L2.getWheelDiameter() * Math.PI;
         public static final double MAX_VELOCITY_METERS_PER_SECOND = 4.5;
-        public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = MAX_VELOCITY_METERS_PER_SECOND / Math.hypot(DRIVETRAIN_TRACKWIDTH_METERS / 2.0, DRIVETRAIN_WHEELBASE_METERS / 2.0);
-        public static final double MAX_ANGULAR_ACCELERATION_RADIANS_PER_SECOND = +MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND * 2 * Math.PI / 5;
+        public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND =
+                MAX_VELOCITY_METERS_PER_SECOND / Math.hypot(DRIVETRAIN_TRACKWIDTH_METERS / 2.0,
+                        DRIVETRAIN_WHEELBASE_METERS / 2.0);
+        public static final double MAX_ANGULAR_ACCELERATION_RADIANS_PER_SECOND =
+                +MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND * 2 * Math.PI / 5;
 
         // Module configuration constants
         public static final int DRIVE_CURRENT_LIMIT = 40;
@@ -105,7 +110,8 @@ public final class Constants {
         public static final Rotation2d HEADING_OFFSET = Rotation2d.fromDegrees(90);
 
         // Standard dev for robot pose
-        public static final Matrix<N3, N1> STANDARD_DEV_POSE_MATRIX = VecBuilder.fill(0.1, 0.1, 0.1);
+        public static final Matrix<N3, N1> STANDARD_DEV_POSE_MATRIX =
+                VecBuilder.fill(0.1, 0.1, 0.1);
 
         // Gains vaules for PIDControllers
         public static final class Gains {
@@ -142,7 +148,7 @@ public final class Constants {
 
             // Blackouts swerve module absolute encoder offsets
             public static final class Blackout { // TODO Need offsets
-                public static final double FRONT_LEFT_STEER_OFFSET = -Math.toRadians(253.916); 
+                public static final double FRONT_LEFT_STEER_OFFSET = -Math.toRadians(253.916);
                 public static final double FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(222.451);
                 public static final double BACK_LEFT_STEER_OFFSET = -Math.toRadians(19.688);
                 public static final double BACK_RIGHT_STEER_OFFSET = -Math.toRadians(63.018);
@@ -152,7 +158,9 @@ public final class Constants {
 
     public static final class LimelightConstants {
         public static final String FRONT_NAME = "limelight-front";
-        public static final Pose3d FRONT_POSE = new Pose3d(.1, 0.28, 0.72, new Rotation3d(0, 0, 0)); // Position on robot
+        public static final Pose3d FRONT_POSE = new Pose3d(.1, 0.28, 0.72, new Rotation3d(0, 0, 0)); // Position
+                                                                                                     // on
+                                                                                                     // robot
         public static final double CUBE_OFFSET = 0.0; // TODO find this value
     }
 
@@ -169,10 +177,21 @@ public final class Constants {
         public static final MotorType MOTOR_TYPE = MotorType.kBrushless;
         public static final NeutralMode NEUTRAL_MODE = NeutralMode.Brake;
 
-        public static final double STALL_POWER = 35d; // Used to detect wether or not the collector is stalling meaning it has a game piece
-        //TODO Test Amount ^
+        public static final double STALL_POWER = 35d; // Used to detect wether or not the collector
+                                                      // is stalling meaning it has a game piece
+        // TODO Test Amount ^
 
         public static final double LOG_PERIOD = 0.22;
+
+        public static final double INSIDE_kP = 0.01;
+        public static final double INSIDE_kD = 0.01;
+        public static final double INSIDE_kI = 0.01;
+        public static final double INSIDE_kF = 0.01;
+
+        public static final double OUTSIDE_kP = 0.01;
+        public static final double OUTSIDE_kD = 0.01;
+        public static final double OUTSIDE_kI = 0.01;
+        public static final double OUTSIDE_kF = 0.01;
     }
 
     public static final class WristConstants {
@@ -206,19 +225,22 @@ public final class Constants {
 
         public static final double LOG_PERIOD = 0.24;
 
-        // Offsets in degrees        
-        public static final double ENCODER_OFFSET_GRIDLOCK = 20.8; //-161.5d;
+        // Offsets in degrees
+        public static final double ENCODER_OFFSET_GRIDLOCK = 20.8; // -161.5d;
 
-        public static final double ENCODER_OFFSET_BLACKOUT = -22; //TODO: check this
+        public static final double ENCODER_OFFSET_BLACKOUT = -22; // TODO: check this
 
         // Conversion factor for our wrist, multiply this by the navite units to get degrees
         public static final double POSITION_CONVERSION_FACTOR = 360;
 
         // Wrist limit switch types
-        public static final SparkMaxLimitSwitch.Type TOP_LIMIT_SWITCH_TYPE = SparkMaxLimitSwitch.Type.kNormallyOpen;
-        public static final SparkMaxLimitSwitch.Type BOTTOM_LIMIT_SWITCH_TYPE = SparkMaxLimitSwitch.Type.kNormallyOpen;
+        public static final SparkMaxLimitSwitch.Type TOP_LIMIT_SWITCH_TYPE =
+                SparkMaxLimitSwitch.Type.kNormallyOpen;
+        public static final SparkMaxLimitSwitch.Type BOTTOM_LIMIT_SWITCH_TYPE =
+                SparkMaxLimitSwitch.Type.kNormallyOpen;
 
-        // Interpolation map for our arm Feedforward values to make sure we have enough minimum power to move the arm
+        // Interpolation map for our arm Feedforward values to make sure we have enough minimum
+        // power to move the arm
     }
 
 
@@ -283,7 +305,7 @@ public final class Constants {
         // Target X position for the middle of the charge station
         public static final double TARGET_X = 3.85;// 3.93;
 
-        //log period for autobalance
+        // log period for autobalance
         public static final double LOG_PERIOD = 0.2;
 
         // Gains for our auto balance
@@ -311,8 +333,10 @@ public final class Constants {
         // Arbitrary value for how close the robot needs to be to the target (in degrees)
         public static final double HORIZ_DEGREE_TOLERANCE = 3d;
 
-        // Standard deviation for vision, heading is 1000 becuase were using pigeon, so i dont want to use vision heading
-        public static final Matrix<N3, N1> STANDARD_DEV_VISION_MATRIX = VecBuilder.fill(0.6, 0.6, 0.6);
+        // Standard deviation for vision, heading is 1000 becuase were using pigeon, so i dont want
+        // to use vision heading
+        public static final Matrix<N3, N1> STANDARD_DEV_VISION_MATRIX =
+                VecBuilder.fill(0.6, 0.6, 0.6);
 
         // Distance from the center of the field, used for getIsolatedTagPose()
         public static final double ISOLATEDTAGXOFFSET = 7.24;
@@ -335,9 +359,15 @@ public final class Constants {
     // Constants for autonomous
     public static final class AutonomousConstants {
         // Path planner PIDConstants
-        public static final PIDConstants DRIVE_PID_CONSTANTS = new PIDConstants(2.5, 0, 0); // Drive velocity PID 10.5
-        public static final PIDConstants THETA_PID_CONSTANTS = new PIDConstants(4, 0, 0); // Rotation PID 7
-        public static final PIDConstants POSE_PID_CONSTANTS = new PIDConstants(0, 0, 0); // X and Y position PID
+        public static final PIDConstants DRIVE_PID_CONSTANTS = new PIDConstants(2.5, 0, 0); // Drive
+                                                                                            // velocity
+                                                                                            // PID
+                                                                                            // 10.5
+        public static final PIDConstants THETA_PID_CONSTANTS = new PIDConstants(4, 0, 0); // Rotation
+                                                                                          // PID 7
+        public static final PIDConstants POSE_PID_CONSTANTS = new PIDConstants(0, 0, 0); // X and Y
+                                                                                         // position
+                                                                                         // PID
 
         // Max velocity and acceleration for the path planner
         public static final double MAX_VELOCITY = 2;
@@ -347,33 +377,53 @@ public final class Constants {
 
     }
 
-    //Constants for autoAlign
+    // Constants for autoAlign
     public static final class AutoAlignConstants {
 
         public static final class BluePoints {
-            public static final Pose2d SLOT_1_POSE = new Pose2d(2.44, 4.9, Rotation2d.fromDegrees(180));
-            public static final Pose2d SLOT_2_POSE = new Pose2d(2.44, 4.35, Rotation2d.fromDegrees(180));
-            public static final Pose2d SLOT_3_POSE = new Pose2d(2.44, 3.8, Rotation2d.fromDegrees(180));
-            public static final Pose2d SLOT_4_POSE = new Pose2d(2.44, 3.25, Rotation2d.fromDegrees(180));
-            public static final Pose2d SLOT_5_POSE = new Pose2d(2.44, 2.7, Rotation2d.fromDegrees(180));
-            public static final Pose2d SLOT_6_POSE = new Pose2d(2.44, 2.15, Rotation2d.fromDegrees(180));
-            public static final Pose2d SLOT_7_POSE = new Pose2d(2.44, 1.6, Rotation2d.fromDegrees(180));
-            public static final Pose2d SLOT_8_POSE = new Pose2d(2.44, 1.05, Rotation2d.fromDegrees(180));
-            public static final Pose2d SLOT_9_POSE = new Pose2d(2.44, 0.5, Rotation2d.fromDegrees(180));
-            public static final Pose2d SLOT_10_POSE = new Pose2d(14.23, 2.65, Rotation2d.fromDegrees(90));
+            public static final Pose2d SLOT_1_POSE =
+                    new Pose2d(2.44, 4.9, Rotation2d.fromDegrees(180));
+            public static final Pose2d SLOT_2_POSE =
+                    new Pose2d(2.44, 4.35, Rotation2d.fromDegrees(180));
+            public static final Pose2d SLOT_3_POSE =
+                    new Pose2d(2.44, 3.8, Rotation2d.fromDegrees(180));
+            public static final Pose2d SLOT_4_POSE =
+                    new Pose2d(2.44, 3.25, Rotation2d.fromDegrees(180));
+            public static final Pose2d SLOT_5_POSE =
+                    new Pose2d(2.44, 2.7, Rotation2d.fromDegrees(180));
+            public static final Pose2d SLOT_6_POSE =
+                    new Pose2d(2.44, 2.15, Rotation2d.fromDegrees(180));
+            public static final Pose2d SLOT_7_POSE =
+                    new Pose2d(2.44, 1.6, Rotation2d.fromDegrees(180));
+            public static final Pose2d SLOT_8_POSE =
+                    new Pose2d(2.44, 1.05, Rotation2d.fromDegrees(180));
+            public static final Pose2d SLOT_9_POSE =
+                    new Pose2d(2.44, 0.5, Rotation2d.fromDegrees(180));
+            public static final Pose2d SLOT_10_POSE =
+                    new Pose2d(14.23, 2.65, Rotation2d.fromDegrees(90));
         }
 
         public static final class RedPoints {
-            public static final Pose2d SLOT_10_POSE = new Pose2d(14.23, .09, Rotation2d.fromDegrees(-90));
-            public static final Pose2d SLOT_9_POSE = new Pose2d(2.44, 7.3, Rotation2d.fromDegrees(180));
-            public static final Pose2d SLOT_8_POSE = new Pose2d(2.44, 6.75, Rotation2d.fromDegrees(180));
-            public static final Pose2d SLOT_7_POSE = new Pose2d(2.44, 6.2, Rotation2d.fromDegrees(180));
-            public static final Pose2d SLOT_6_POSE = new Pose2d(2.44, 5.65, Rotation2d.fromDegrees(180));
-            public static final Pose2d SLOT_5_POSE = new Pose2d(2.44, 5.1, Rotation2d.fromDegrees(180));
-            public static final Pose2d SLOT_4_POSE = new Pose2d(2.44, 4.55, Rotation2d.fromDegrees(180));
-            public static final Pose2d SLOT_3_POSE = new Pose2d(2.44, 4.0, Rotation2d.fromDegrees(180));
-            public static final Pose2d SLOT_2_POSE = new Pose2d(2.44, 3.45, Rotation2d.fromDegrees(180));
-            public static final Pose2d SLOT_1_POSE = new Pose2d(2.44, 2.9, Rotation2d.fromDegrees(180));
+            public static final Pose2d SLOT_10_POSE =
+                    new Pose2d(14.23, .09, Rotation2d.fromDegrees(-90));
+            public static final Pose2d SLOT_9_POSE =
+                    new Pose2d(2.44, 7.3, Rotation2d.fromDegrees(180));
+            public static final Pose2d SLOT_8_POSE =
+                    new Pose2d(2.44, 6.75, Rotation2d.fromDegrees(180));
+            public static final Pose2d SLOT_7_POSE =
+                    new Pose2d(2.44, 6.2, Rotation2d.fromDegrees(180));
+            public static final Pose2d SLOT_6_POSE =
+                    new Pose2d(2.44, 5.65, Rotation2d.fromDegrees(180));
+            public static final Pose2d SLOT_5_POSE =
+                    new Pose2d(2.44, 5.1, Rotation2d.fromDegrees(180));
+            public static final Pose2d SLOT_4_POSE =
+                    new Pose2d(2.44, 4.55, Rotation2d.fromDegrees(180));
+            public static final Pose2d SLOT_3_POSE =
+                    new Pose2d(2.44, 4.0, Rotation2d.fromDegrees(180));
+            public static final Pose2d SLOT_2_POSE =
+                    new Pose2d(2.44, 3.45, Rotation2d.fromDegrees(180));
+            public static final Pose2d SLOT_1_POSE =
+                    new Pose2d(2.44, 2.9, Rotation2d.fromDegrees(180));
         }
 
         public static enum SlotPosition { // Position of each colum of scoring nodes for AutoScoring
@@ -383,7 +433,7 @@ public final class Constants {
         public static final double MAX_ACCELERATION_MUL = 1;
 
         public static final double TOLERANCE_CUBE_ALLIGN_Y = 5d;
-        public static final double TOLERANCE_CUBE_ALLIGN_Z = 5d; 
+        public static final double TOLERANCE_CUBE_ALLIGN_Z = 5d;
 
         public static final double CONTROL_LENGTHS = 0.001;
 
@@ -393,22 +443,32 @@ public final class Constants {
 
         public static final double HORIZONTAL_MULTIPLIER = 1d;
 
-        //Log period auto align
+        // Log period auto align
         public static final double LOG_PERIOD = 0.25;
     }
 
     public static final class WristAngles {
-        public static final HashMap <String, Double> wristAngle() {
-            HashMap<String, Double> angleMap = new HashMap<>();
-            angleMap.put("High-Score-Cube", 0d);
-            angleMap.put("Mid-Score-Cube", 0d);
-            angleMap.put("Low-Score-Cube", 0d);
-            angleMap.put("Ground-Collect-Cube", 0d);
+
+        public static final HashMap<wristStates, Double> angleMap() { // TODO Get Angles
+            HashMap<wristStates, Double> angleMap = new HashMap<>();
+            angleMap.put(wristStates.Ground, 0d);
+            angleMap.put(wristStates.Stow, 0d);
+            angleMap.put(wristStates.MidCube, 0d);
+            angleMap.put(wristStates.HighCube, 0d);
             return angleMap;
+        }
+        
+        public static final HashMap<wristStates, Integer> shootSpeedMap() { // TODO Get Speeds
+            HashMap<wristStates, Integer> shootSpeedMap = new HashMap<>();
+            shootSpeedMap.put(wristStates.Ground, 0);
+            shootSpeedMap.put(wristStates.MidCube, 0);
+            shootSpeedMap.put(wristStates.HighCube, 0);
+            return shootSpeedMap;
         }
 
         public static enum wristStates {
-            groundCube, LowCube, MidCube, HighCube, stow
+            Ground, MidCube, HighCube, Stow
         }
+
     }
 }

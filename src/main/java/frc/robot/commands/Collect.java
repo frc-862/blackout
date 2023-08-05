@@ -28,9 +28,9 @@ public class Collect extends CommandBase {
     @Override
     public void execute() { // TODO See How this works with new Design
         if (collector.getGamePiece() == GamePiece.CONE) {
-            collector.setPower(-input.getAsDouble());
+            collector.setPercentPower(-input.getAsDouble());
         } else {
-            collector.setPower(input.getAsDouble());
+            collector.setPercentPower(input.getAsDouble());
         }
     }
 

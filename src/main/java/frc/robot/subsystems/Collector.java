@@ -6,8 +6,6 @@ import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -16,6 +14,7 @@ import frc.robot.Constants.GamePiece;
 import frc.robot.Constants.RobotMap.*;
 import frc.thunder.config.FalconConfig;
 import frc.thunder.shuffleboard.LightningShuffleboardPeriodic;
+import frc.thunder.shuffleboard.LightningShuffleboard;
 
 /**
  * The collector subsystem
@@ -45,6 +44,11 @@ public class Collector extends SubsystemBase {
         // Initialize the shuffleboard values and start logging data
         initialiizeShuffleboard();
 
+        configPIDGains(insideMotor, CollectorConstants.INSIDE_kP, CollectorConstants.INSIDE_kI, 
+                    CollectorConstants.INSIDE_kD, CollectorConstants.INSIDE_kF);
+        configPIDGains(outsideMotor, CollectorConstants.INSIDE_kP, CollectorConstants.INSIDE_kI, 
+                    CollectorConstants.INSIDE_kD, CollectorConstants.INSIDE_kF);
+
         CommandScheduler.getInstance().registerSubsystem(this);
     }
 
@@ -53,9 +57,20 @@ public class Collector extends SubsystemBase {
      * 
      * @param power the percent speed to set the collector motors to
      */
-    public void setPower(double power) {
+    public void setPercentPower(double power) {
         insideMotor.set(TalonFXControlMode.PercentOutput, power);
         outsideMotor.set(TalonFXControlMode.PercentOutput, power);
+    }
+
+    /**
+     * Sets the power of the collector motors in RPM
+     * 
+     * @param RPM the velocity to set the collector motors to in RPM
+     */
+    public void setRPM(double RPM) {
+        double ticks = (RPM / 600) * 2048;
+        insideMotor.set(TalonFXControlMode.Velocity, ticks);
+        outsideMotor.set(TalonFXControlMode.Velocity, ticks);
     }
 
     /**
@@ -147,16 +162,49 @@ public class Collector extends SubsystemBase {
         outsideMotor.setNeutralMode(NeutralMode.Brake);
     }
 
+    public double currentEncoderTicks(TalonFX motor) {
+		return motor.getSelectedSensorPosition();
+	}
+
+    public double getCurrentRPM(TalonFX motor) {
+		return motor.getSelectedSensorVelocity() / 2048 * 600; //converts from revs per second to revs per minute
+	}
+
+    private void configPIDGains(TalonFX motor, double kP, double kI, double kD, double kV) {
+		motor.config_kP(0, kP);
+		motor.config_kI(0, kI);
+		motor.config_kD(0, kD);
+		motor.config_kF(0, kV);
+	}
+
     /**
      * stop Sets the power of the collector motor to 0
      */
     public void stop() {
-        setPower(0d);
+        setPercentPower(0d);
     }
 
     @Override
     public void periodic() {
 
         periodicShuffleboard.loop();
+
+        insideMotor.config_kP(0, LightningShuffleboard.getDouble("Collector", "INSIDE_kP", CollectorConstants.INSIDE_kP));
+        insideMotor.config_kP(0, LightningShuffleboard.getDouble("Collector", "INSIDE_kI", CollectorConstants.INSIDE_kI));
+        insideMotor.config_kP(0, LightningShuffleboard.getDouble("Collector", "INSIDE_kD", CollectorConstants.INSIDE_kD));
+        insideMotor.config_kP(0, LightningShuffleboard.getDouble("Collector", "INSIDE_kF", CollectorConstants.INSIDE_kF));
+
+        outsideMotor.config_kP(0, LightningShuffleboard.getDouble("Collector", "OUTSIDE_kP", CollectorConstants.INSIDE_kP));
+        outsideMotor.config_kP(0, LightningShuffleboard.getDouble("Collector", "OUTSIDE_kI", CollectorConstants.INSIDE_kI));
+        outsideMotor.config_kP(0, LightningShuffleboard.getDouble("Collector", "OUTSIDE_kD", CollectorConstants.INSIDE_kD));
+        outsideMotor.config_kP(0, LightningShuffleboard.getDouble("Collector", "OUTSIDE_kF", CollectorConstants.INSIDE_kF));
+
+        LightningShuffleboard.setDouble("Collector", "INSIDE_RPM", getCurrentRPM(insideMotor));
+        LightningShuffleboard.setDouble("Collector", "OUTSIDE_RPM", getCurrentRPM(outsideMotor));
+
+        LightningShuffleboard.setDouble("Collector", "INSIDE_Ticks", currentEncoderTicks(insideMotor));
+        LightningShuffleboard.setDouble("Collector", "OUTSIDE_Ticks", currentEncoderTicks(outsideMotor));
+
+        setRPM(LightningShuffleboard.getDouble("Collector", "Set RPM", 0));
     }
 }

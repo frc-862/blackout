@@ -75,7 +75,8 @@ public class HoldPower extends CommandBase {
                 driver.setRumble(RumbleType.kBothRumble, 0);
                 copilot.setRumble(RumbleType.kBothRumble, 0);
             }
-            collector.setPower(power);
+            
+            collector.setPercentPower(power);
         }
     }
 

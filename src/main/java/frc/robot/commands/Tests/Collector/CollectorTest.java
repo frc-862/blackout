@@ -13,30 +13,30 @@ public class CollectorTest extends CommandBase {
 	public CollectorTest(Collector collector, double maxPower) {
 		this.collector = collector;
 		this.maxPower = maxPower;
-	
+
 		addRequirements(collector);
 	}
 
 	@Override
 	public void initialize() {
-		collector.setPower(0d);
+		collector.setPercentPower(0d);
 		collector.setCoastMode();
 	}
 
 	@Override
 	public void execute() {
-		if(power < maxPower) {
+		if (power < maxPower) {
 			power += 0.05d;
 		}
-		collector.setPower(power);
-		
+		collector.setPercentPower(power);
+
 	}
 
 	// Called once the command ends or is interrupted.
 	@Override
 	public void end(boolean interrupted) {
-		collector.setPower(0d);
+		collector.setPercentPower(0d);
 		collector.setBrakeMode();
 	}
-	
+
 }

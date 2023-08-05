@@ -21,15 +21,16 @@ import frc.robot.Constants.GamePiece;
 import frc.robot.commands.AutoBalance;
 import frc.robot.commands.Collect;
 import frc.robot.commands.SwerveDrive;
-import frc.robot.commands.wristState;
 import frc.robot.commands.Tests.Collector.CollectorTest;
 import frc.robot.commands.Tests.Drive.DriveTrainSystemTest;
 import frc.robot.commands.HoldPower;
 import frc.robot.commands.SafeToScoreLED;
+import frc.robot.commands.Shoot;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.LEDs;
 import frc.thunder.LightningContainer;
 import frc.robot.Constants.LimelightConstants;
+import frc.robot.Constants.WristAngles.wristStates;
 import frc.thunder.auto.Autonomous;
 import frc.thunder.auto.AutonomousCommandFactory;
 import frc.thunder.testing.SystemTest;
@@ -83,11 +84,17 @@ public class RobotContainer extends LightningContainer {
         /* copilot controls */
         
         //SETPOINTS
-        // new Trigger(copilot::getRightBumper).onTrue(); 
-        
+        new Trigger(copilot::getAButton).onTrue(new InstantCommand(() -> wrist.setGoalState(wristStates.Ground), wrist));
+        new Trigger(copilot::getBButton).onTrue(new InstantCommand(() -> wrist.setGoalState(wristStates.Stow), wrist)); 
+        new Trigger(copilot::getXButton).onTrue(new InstantCommand(() -> wrist.setGoalState(wristStates.MidCube), wrist));
+        new Trigger(copilot::getYButton).onTrue(new InstantCommand(() -> wrist.setGoalState(wristStates.HighCube), wrist));
+
+        //SHOOT
+        new Trigger(() -> copilot.getRightBumper() && copilot.getLeftBumper()).onTrue(new Shoot(collector, wrist));
+
         //FLICK TODO FIX
-        new Trigger(() -> -copilot.getLeftY() > 0.25).onTrue(new InstantCommand(() -> wrist.setAngle(150))); 
-        new Trigger(() -> -copilot.getLeftY() < -0.25).onTrue(new InstantCommand(() -> wrist.setAngle(10)));
+        new Trigger(() -> -copilot.getLeftY() > 0.25).onTrue(new InstantCommand(() -> wrist.setTargetAngle(150))); 
+        new Trigger(() -> -copilot.getLeftY() < -0.25).onTrue(new InstantCommand(() -> wrist.setTargetAngle(10)));
 
         //BREAK
         // new Trigger(copilot::getRightStickButton).onTrue(new InstantCommand(lift::breakLift)); // Breaks out of current goal state and sets itself to onTarget so it can go to a new State
@@ -95,6 +102,7 @@ public class RobotContainer extends LightningContainer {
         // DISABLE LIFT
         new Trigger(() -> copilot.getStartButton() && copilot.getBackButton())
             .onTrue(new InstantCommand(wrist::disableWrist));
+
     }
 
     // Creates the autonomous commands
@@ -111,7 +119,6 @@ public class RobotContainer extends LightningContainer {
 
     @Override
     protected void configureDefaultCommands() {
-        wrist.setDefaultCommand(new wristState(wrist));
 
         /*
          * Set up the default command for the drivetrain. The controls are for field-oriented driving: Left

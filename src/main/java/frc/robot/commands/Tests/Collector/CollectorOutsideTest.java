@@ -19,14 +19,14 @@ public class CollectorOutsideTest extends CommandBase {
 	// Called when the command is initially scheduled.
 	@Override
 	public void initialize() {
-		collector.setPower(0d);
+		collector.setPercentPower(0d);
 		collector.setCoastMode();
 	}
 
 	// Called every time the scheduler runs while the command is scheduled.
 	@Override
 	public void execute() {
-		if(power < maxpower) {
+		if (power < maxpower) {
 			power += 0.05d;
 		}
 		collector.setOutsidePower(power);
@@ -35,7 +35,7 @@ public class CollectorOutsideTest extends CommandBase {
 	// Called once the command ends or is interrupted.
 	@Override
 	public void end(boolean interrupted) {
-		collector.setPower(0d);
+		collector.setPercentPower(0d);
 		collector.setBrakeMode();
 	}
 }
