@@ -210,39 +210,33 @@ public final class Constants {
         public static final double UP_kP = 0.0079d;
         public static final double UP_kI = 0.0d;
         public static final double UP_kD = 0.0001d;
-        public static final double UP_F = 0.0d;
+        public static final double UP_FF = 0.0d;
 
 
         public static final double DOWN_kP = 0.006d;
         public static final double DOWN_kI = 0d;
         public static final double DOWN_kD = 0d;
-        public static final double DOWN_F = 0d;
+        public static final double DOWN_FF = 0d;
 
         // Tolernace for our wrist
         public static final double TOLERANCE = 12d;
 
         // Min/max angles in degrees
-        public static final double MAX_ANGLE = 151d;
+        public static final double MAX_ANGLE = 151d; // TODO reget
         public static final double MIN_ANGLE = -100d;
 
         // Min and Max power
-        public static final double MIN_POWER = -1d;
+        public static final double MIN_POWER = -1d; // TODO implement and check
         public static final double MAX_POWER = 0.9d;
 
         public static final double LOG_PERIOD = 0.24;
 
         // Offsets in degrees
-        public static final double RIGHT_OFFSET = 0d;
+        public static final double RIGHT_OFFSET = 0d; // TODO GET NEW
         public static final double LEFT_OFFSET = 0d;
 
         // Conversion factor for our wrist, multiply this by the navite units to get degrees
-        public static final double POSITION_CONVERSION_FACTOR = 360;
-
-        // Wrist limit switch types
-        public static final SparkMaxLimitSwitch.Type TOP_LIMIT_SWITCH_TYPE =
-                SparkMaxLimitSwitch.Type.kNormallyOpen;
-        public static final SparkMaxLimitSwitch.Type BOTTOM_LIMIT_SWITCH_TYPE =
-                SparkMaxLimitSwitch.Type.kNormallyOpen;
+        public static final double POSITION_CONVERSION_FACTOR = 360; // TODO check
 
         // Interpolation map for our arm Feedforward values to make sure we have enough minimum
         // power to move the arm
@@ -286,12 +280,12 @@ public final class Constants {
             public static final int BACK_LEFT_CANCODER = 34;
 
             // COLLECTOR
-            public static final int INSIDE_COLLECTOR_MOTOR = 12; // TODO get Real
-            public static final int OUTSIDE_COLLECTOR_MOTOR = 9; // TODO GET REAL
+            public static final int INSIDE_COLLECTOR_MOTOR = 9; // TODO get Real
+            public static final int OUTSIDE_COLLECTOR_MOTOR = 10; // TODO GET REAL
 
             // WRIST
             public static final int RIGHT_WRIST_MOTOR = 11; // TODO get Real
-            public static final int LEFT_WRIST_MOTOR = 10; // TODO get Real
+            public static final int LEFT_WRIST_MOTOR = 12; // TODO get Real
 
             // CANdle
             public static final int CANDLE = 22;

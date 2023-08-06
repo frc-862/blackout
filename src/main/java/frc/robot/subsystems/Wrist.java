@@ -1,5 +1,8 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.StrictFollower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
 import edu.wpi.first.math.MathUtil;
@@ -35,18 +38,20 @@ public class Wrist extends SubsystemBase {
     private double PIDOutput = 0d;
     private double currentAngle;
     private double targetAngle;
-    private double LEFT_OFFSET = 0;
-    private double RIGHT_OFFSET = 0;
 
     public Wrist() {
-        rightMotor = FalconConfig.createMotor(CAN.RIGHT_WRIST_MOTOR,
-                WristConstants.RIGHT_MOTOR_INVERT, WristConstants.SUPPLY_CURRENT_LIMIT,
-                CollectorConstants.STATOR_CURRENT_LIMIT, WristConstants.NEUTRAL_MODE);
         leftMotor = FalconConfig.createMotor(CAN.LEFT_WRIST_MOTOR, WristConstants.LEFT_MOTOR_INVERT,
                 WristConstants.SUPPLY_CURRENT_LIMIT, WristConstants.STATOR_CURRENT_LIMIT,
-                WristConstants.NEUTRAL_MODE);
+                WristConstants.NEUTRAL_MODE, WristConstants.UP_kP, WristConstants.UP_kI, WristConstants.UP_kD,
+                WristConstants.DOWN_kP, WristConstants.DOWN_kI, WristConstants.DOWN_kD);
 
-        
+        rightMotor = FalconConfig.createMotor(CAN.RIGHT_WRIST_MOTOR,
+                WristConstants.RIGHT_MOTOR_INVERT, WristConstants.SUPPLY_CURRENT_LIMIT,
+                CollectorConstants.STATOR_CURRENT_LIMIT, WristConstants.NEUTRAL_MODE, WristConstants.UP_kP, WristConstants.UP_kI, WristConstants.UP_kD,
+                WristConstants.DOWN_kP, WristConstants.DOWN_kI, WristConstants.DOWN_kD);
+
+        // Channel 0 is up
+        // Channel 1 is down
 
         CommandScheduler.getInstance().registerSubsystem(this);
     }
@@ -55,13 +60,12 @@ public class Wrist extends SubsystemBase {
         currState = wristStates.Stow;
         goalState = wristStates.Stow;
 
-        LEFT_OFFSET = WristConstants.LEFT_OFFSET;
-        RIGHT_OFFSET = WristConstants.RIGHT_OFFSET;
+        rightMotor.setControl(new Follower(10, false)); // TODO make sure the direction is right 
     }
 
     
     public void setTargetAngle(double angle) {
-        
+        targetAngle = MathUtil.clamp(angle, WristConstants.MIN_ANGLE, WristConstants.MAX_ANGLE);
     }
     
     /**
@@ -69,12 +73,12 @@ public class Wrist extends SubsystemBase {
      * 
      * @return Rotation2d of the wrist from encoder
      */
-    public Rotation2d getAngle() { //TODO FIX
-        return Rotation2d.fromDegrees(MathUtil.inputModulus(leftMotor.getRotorPosition().getValue() * WristConstants.POSITION_CONVERSION_FACTOR - LEFT_OFFSET, -180, 180));
+    public Rotation2d getAngle() { //TODO FIX CONVERSION factor
+        return Rotation2d.fromDegrees(MathUtil.inputModulus(leftMotor.getRotorPosition().getValue() * WristConstants.POSITION_CONVERSION_FACTOR - WristConstants.LEFT_OFFSET, -180, 180));
     }
     
     public void disableWrist() {
-        setPower(0d);
+        stop();
         disableWrist = true;
     }
     
@@ -83,8 +87,11 @@ public class Wrist extends SubsystemBase {
      * @param power sets power from percent output
      */
     public void setPower(double power) {
-        rightMotor.set(power);
         leftMotor.set(power);
+    }
+
+    public void stop() {
+        leftMotor.stopMotor();
     }
 
     public void setGoalState(wristStates goalState) {
@@ -104,7 +111,8 @@ public class Wrist extends SubsystemBase {
             setTargetAngle(WristAngles.angleMap().get(goalState));
             currState = goalState;
         }
-
+        
+        // TODO THESE DON'T effect anything
         upController.setP(LightningShuffleboard.getDouble("Collector", "UP_kP", WristConstants.UP_kP));
         upController.setI(LightningShuffleboard.getDouble("Collector", "UP_kI", WristConstants.UP_kI));
         upController.setD(LightningShuffleboard.getDouble("Collector", "UP_kD", WristConstants.UP_kD));
@@ -113,20 +121,21 @@ public class Wrist extends SubsystemBase {
         downController.setI(LightningShuffleboard.getDouble("Collector", "DOWN_kI", WristConstants.DOWN_kI));
         downController.setD(LightningShuffleboard.getDouble("Collector", "DOWN_kD", WristConstants.DOWN_kD));
 
-        targetAngle = (LightningShuffleboard.getDouble("Collector", "UP_F", WristConstants.UP_F));
+        targetAngle = (LightningShuffleboard.getDouble("Collector", "Target Angle", 0));
 
-        if (targetAngle - currentAngle > 0) {
-            PIDOutput = upController.calculate(currentAngle, targetAngle);
+        
+
+        if(!disableWrist){
+            if (targetAngle - currentAngle > 0) {
+                // PIDOutput = upController.calculate(currentAngle, targetAngle);
+                //TODO Figure out convertion from dergrees to rotations
+                leftMotor.setControl(new PositionVoltage(targetAngle, true, WristConstants.UP_FF, 0, false));
+                
+            } else {
+                leftMotor.setControl(new PositionVoltage(targetAngle, true, WristConstants.DOWN_FF, 1, false));
+            }
         } else {
-            PIDOutput = downController.calculate(currentAngle, targetAngle);
-        }
-
-        FOutput = WristConstants.WRIST_KF_MAP.get(getAngle().getDegrees());
-
-        if(disableWrist){
-            setPower(0);
-        } else {
-            setPower(PIDOutput + FOutput);
+            stop();
         }
     }
 }

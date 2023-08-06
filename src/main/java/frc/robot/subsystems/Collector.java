@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -12,8 +13,6 @@ import frc.robot.Constants.RobotMap.*;
 import frc.thunder.config.FalconConfig;
 import frc.thunder.shuffleboard.LightningShuffleboardPeriodic;
 import frc.thunder.shuffleboard.LightningShuffleboard;
-import com.ctre.phoenix6.controls.ControlRequest;
-import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 
 /**
@@ -91,12 +90,14 @@ public class Collector extends SubsystemBase {
         outsideMotor.set(power);
     }
 
-    // // Method to start logging
-    // @SuppressWarnings("unchecked")
-    // private void initialiizeShuffleboard() {
-    //     periodicShuffleboard = new LightningShuffleboardPeriodic("Collector", CollectorConstants.LOG_PERIOD,
-    //         new Pair<String, Object>("Collector motor output percent", (DoubleSupplier) () -> insideMotor.getMotorOutputPercent()));
-    // }
+    // Method to start logging
+    @SuppressWarnings("unchecked")
+    private void initialiizeShuffleboard() {
+        periodicShuffleboard = new LightningShuffleboardPeriodic("Collector", CollectorConstants.LOG_PERIOD,
+            new Pair<String, Object>("Collector motor output percent", (DoubleSupplier) () -> insideMotor.get()),
+            new Pair<String, Object>("Collector RPM", (DoubleSupplier) () -> getCurrentRPM()),
+            new Pair<String, Object>("Is Stalling", (BooleanSupplier) () -> isStalling()));
+    }
 
     /**
      * Sets supply current limit if its different from the current supply current limit
@@ -121,7 +122,7 @@ public class Collector extends SubsystemBase {
      */
     public void setStatorCurrentLimit(int statorLimit) {
         if (statorLimit != currStatorCurrentLimit) {
-            // insideMotor.configStatorCurrentLimit(
+            // insideMotor.configStatorCurrentLimit();
             //         new StatorCurrentLimitConfiguration(true, statorLimit, statorLimit, .25), 250);
             // outsideMotor.configStatorCurrentLimit(
             //         new StatorCurrentLimitConfiguration(true, statorLimit, statorLimit, .25), 250);
@@ -153,6 +154,7 @@ public class Collector extends SubsystemBase {
     }
 
     public void setCoastMode() { //TODO see if possible probably not nessecary
+
         // insideMotor.setNeutralMode(NeutralModeValue.Coast);
         // outsideMotor.setNeutralMode(NeutralModeValue.Coast);
     }
@@ -161,14 +163,6 @@ public class Collector extends SubsystemBase {
         // insideMotor.setNeutralMode(NeutralModeValue.Brake);
         // outsideMotor.setNeutralModeValue(NeutralModeValue.Brake);
     }
-
-    // public double currentEncoderTicks(TalonFX motor) {
-	// 	// return motor.getSelectedSensorPosition();
-	// }
-
-    // public double getCurrentRPM(TalonFX motor) {
-	// 	return motor.getSelectedSensorVelocity() / 2048 * 600; //converts from revs per second to revs per minute
-	// }
 
     /**
      * gets current RPM from internal encoders
