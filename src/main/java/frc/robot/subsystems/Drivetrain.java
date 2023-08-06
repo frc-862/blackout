@@ -4,7 +4,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import com.ctre.phoenix6.hardware.Pigeon2;
 
 import frc.thunder.swervelib.Mk4ModuleConfiguration;
 import frc.thunder.swervelib.Mk4iSwerveModuleHelper;
@@ -69,7 +69,7 @@ public class Drivetrain extends SubsystemBase {
     private int aprilTagTarget = -1;
 
     // Creating new pigeon2 IMU
-    private final WPI_Pigeon2 pigeon = new WPI_Pigeon2(RobotMap.CAN.PIGEON_ID);
+    private final Pigeon2 pigeon = new Pigeon2(RobotMap.CAN.PIGEON_ID);
 
     // Creating our list of module states and module positions
     private SwerveModuleState[] states = {new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState()};
@@ -500,8 +500,8 @@ public class Drivetrain extends SubsystemBase {
     private void initializeShuffleboard() {
         periodicShuffleboard = new LightningShuffleboardPeriodic("Drivetrain", DrivetrainConstants.LOG_PERIOD, 
             new Pair<String, Object>("Pigeon Yaw", (DoubleSupplier) () -> getYaw2d().getDegrees()),
-            new Pair<String, Object>("roll", (DoubleSupplier) () -> pigeon.getRoll()), 
-            new Pair<String, Object>("pitch", (DoubleSupplier) () -> pigeon.getPitch()),
+            new Pair<String, Object>("roll", (DoubleSupplier) () -> pigeon.getRoll().getValue()),
+            new Pair<String, Object>("pitch", (DoubleSupplier) () -> pigeon.getPitch().getValue()),
             new Pair<String, Object>("fl module position", (DoubleSupplier) () -> modulePositions[0].distanceMeters),
             new Pair<String, Object>("fr module position", (DoubleSupplier) () -> modulePositions[1].distanceMeters),
             new Pair<String, Object>("bl module position", (DoubleSupplier) () -> modulePositions[2].distanceMeters),
@@ -560,7 +560,7 @@ public class Drivetrain extends SubsystemBase {
      * @return the current heading of the robot in degrees from 0 to 360
      */
     public Rotation2d getYaw2d() {
-        return Rotation2d.fromDegrees(MathUtil.inputModulus(pigeon.getYaw() - 90, 0, 360));
+        return Rotation2d.fromDegrees(MathUtil.inputModulus(pigeon.getYaw().getValue() - 90, 0, 360));
     }
 
     /**
@@ -569,7 +569,7 @@ public class Drivetrain extends SubsystemBase {
      * @return the current pitch of the robot in degrees from -180 to 180
      */
     public Rotation2d getPitch2d() {
-        return Rotation2d.fromDegrees(MathUtil.inputModulus(pigeon.getPitch(), -180, 180));
+        return Rotation2d.fromDegrees(MathUtil.inputModulus(pigeon.getPitch().getValue(), -180, 180));
     }
 
     /**
@@ -578,7 +578,7 @@ public class Drivetrain extends SubsystemBase {
      * @return the current roll of the robot in degrees from -180 to 180
      */
     public Rotation2d getRoll2d() {
-        return Rotation2d.fromDegrees(MathUtil.inputModulus(pigeon.getRoll(), -180, 180));
+        return Rotation2d.fromDegrees(MathUtil.inputModulus(pigeon.getRoll().getValue(), -180, 180));
     }
 
     /**

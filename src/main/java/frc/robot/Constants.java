@@ -6,8 +6,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.ctre.phoenix.led.CANdle.LEDStripType;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
+// import com.ctre.phoenix.led.CANdle.LEDStripType;
+import com.ctre.phoenix6.controls.NeutralOut;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.SparkMaxLimitSwitch;
 
 import edu.wpi.first.math.Matrix;
@@ -175,7 +176,7 @@ public final class Constants {
         public static final double HOLD_POWER_CUBE = 0.25;
         public static final double HOLD_POWER_CONE = 0.65;
         public static final MotorType MOTOR_TYPE = MotorType.kBrushless;
-        public static final NeutralMode NEUTRAL_MODE = NeutralMode.Brake;
+        public static final NeutralModeValue NEUTRAL_MODE = NeutralModeValue.Brake;
 
         public static final double STALL_POWER = 35d; // Used to detect wether or not the collector
                                                       // is stalling meaning it has a game piece
@@ -183,15 +184,15 @@ public final class Constants {
 
         public static final double LOG_PERIOD = 0.22;
 
-        public static final double INSIDE_kP = 0.01;
+        public static final double INSIDE_kP = 0.01; // TODO NEED THESE
         public static final double INSIDE_kD = 0.01;
         public static final double INSIDE_kI = 0.01;
-        public static final double INSIDE_kF = 0.01;
+        public static final double INSIDE_FF = 0.01;
 
         public static final double OUTSIDE_kP = 0.01;
         public static final double OUTSIDE_kD = 0.01;
         public static final double OUTSIDE_kI = 0.01;
-        public static final double OUTSIDE_kF = 0.01;
+        public static final double OUTSIDE_FF = 0.01;
     }
 
     public static final class WristConstants {
@@ -203,45 +204,39 @@ public final class Constants {
         public static final int SUPPLY_CURRENT_LIMIT = 40;
         public static final int STATOR_CURRENT_LIMIT = 40;
 
-        public static final NeutralMode NEUTRAL_MODE = NeutralMode.Brake;
+        public static final NeutralModeValue NEUTRAL_MODE = NeutralModeValue.Brake;
 
         // PID gains for our wrist going up and down
         public static final double UP_kP = 0.0079d;
         public static final double UP_kI = 0.0d;
         public static final double UP_kD = 0.0001d;
-        public static final double UP_F = 0.0d;
+        public static final double UP_FF = 0.0d;
 
 
         public static final double DOWN_kP = 0.006d;
         public static final double DOWN_kI = 0d;
         public static final double DOWN_kD = 0d;
-        public static final double DOWN_F = 0d;
+        public static final double DOWN_FF = 0d;
 
         // Tolernace for our wrist
         public static final double TOLERANCE = 12d;
 
         // Min/max angles in degrees
-        public static final double MAX_ANGLE = 151d;
+        public static final double MAX_ANGLE = 151d; // TODO reget
         public static final double MIN_ANGLE = -100d;
 
         // Min and Max power
-        public static final double MIN_POWER = -1d;
+        public static final double MIN_POWER = -1d; // TODO implement and check
         public static final double MAX_POWER = 0.9d;
 
         public static final double LOG_PERIOD = 0.24;
 
         // Offsets in degrees
-        public static final double RIGHT_OFFSET = 0d;
+        public static final double RIGHT_OFFSET = 0d; // TODO GET NEW
         public static final double LEFT_OFFSET = 0d;
 
         // Conversion factor for our wrist, multiply this by the navite units to get degrees
-        public static final double POSITION_CONVERSION_FACTOR = 360;
-
-        // Wrist limit switch types
-        public static final SparkMaxLimitSwitch.Type TOP_LIMIT_SWITCH_TYPE =
-                SparkMaxLimitSwitch.Type.kNormallyOpen;
-        public static final SparkMaxLimitSwitch.Type BOTTOM_LIMIT_SWITCH_TYPE =
-                SparkMaxLimitSwitch.Type.kNormallyOpen;
+        public static final double POSITION_CONVERSION_FACTOR = 360; // TODO check
 
         // Interpolation map for our arm Feedforward values to make sure we have enough minimum
         // power to move the arm
@@ -285,12 +280,12 @@ public final class Constants {
             public static final int BACK_LEFT_CANCODER = 34;
 
             // COLLECTOR
-            public static final int INSIDE_COLLECTOR_MOTOR = 12; // TODO get Real
-            public static final int OUTSIDE_COLLECTOR_MOTOR = 9; // TODO GET REAL
+            public static final int INSIDE_COLLECTOR_MOTOR = 9; // TODO get Real
+            public static final int OUTSIDE_COLLECTOR_MOTOR = 10; // TODO GET REAL
 
             // WRIST
             public static final int RIGHT_WRIST_MOTOR = 11; // TODO get Real
-            public static final int LEFT_WRIST_MOTOR = 10; // TODO get Real
+            public static final int LEFT_WRIST_MOTOR = 12; // TODO get Real
 
             // CANdle
             public static final int CANDLE = 22;
@@ -331,7 +326,7 @@ public final class Constants {
     // Constants for the LEDs
     public static final class LedConstants {
         public static final double BRIGHTNESS = .25;
-        public static final LEDStripType STRIP_TYPE = LEDStripType.RGB;
+        // public static final LEDStripType STRIP_TYPE = LEDStripType.RGB;
         public static final int LED_LENGTH = 150;
 
         public static enum LEDStates {
@@ -474,6 +469,7 @@ public final class Constants {
 
         public static final HashMap<wristStates, Integer> shootSpeedMap() { // TODO Get Speeds
             HashMap<wristStates, Integer> shootSpeedMap = new HashMap<>();
+            shootSpeedMap.put(wristStates.Stow, -99999);
             shootSpeedMap.put(wristStates.Ground, 0);
             shootSpeedMap.put(wristStates.MidCube, 0);
             shootSpeedMap.put(wristStates.HighCube, 0);

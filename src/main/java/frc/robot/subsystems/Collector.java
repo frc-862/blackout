@@ -1,11 +1,9 @@
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
-import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -15,6 +13,7 @@ import frc.robot.Constants.RobotMap.*;
 import frc.thunder.config.FalconConfig;
 import frc.thunder.shuffleboard.LightningShuffleboardPeriodic;
 import frc.thunder.shuffleboard.LightningShuffleboard;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 
 /**
  * The collector subsystem
@@ -36,30 +35,29 @@ public class Collector extends SubsystemBase {
         // Create the motor and configure it
         insideMotor = FalconConfig.createMotor(CAN.INSIDE_COLLECTOR_MOTOR,
                 CollectorConstants.INSIDE_MOTOR_INVERT, CollectorConstants.SUPPLY_CURRENT_LIMIT,
-                CollectorConstants.STATOR_CURRENT_LIMIT, CollectorConstants.NEUTRAL_MODE);
+                CollectorConstants.STATOR_CURRENT_LIMIT, CollectorConstants.NEUTRAL_MODE,
+                CollectorConstants.INSIDE_kP, CollectorConstants.INSIDE_kI, 
+                CollectorConstants.INSIDE_kD);
         outsideMotor = FalconConfig.createMotor(CAN.OUTSIDE_COLLECTOR_MOTOR,
                 CollectorConstants.OUTSIDE_MOTOR_INVERT, CollectorConstants.SUPPLY_CURRENT_LIMIT,
-                CollectorConstants.STATOR_CURRENT_LIMIT, CollectorConstants.NEUTRAL_MODE);
+                CollectorConstants.STATOR_CURRENT_LIMIT, CollectorConstants.NEUTRAL_MODE,
+                CollectorConstants.OUTSIDE_kP, CollectorConstants.OUTSIDE_kI, 
+                CollectorConstants.OUTSIDE_kD);
 
         // Initialize the shuffleboard values and start logging data
-        initialiizeShuffleboard();
-
-        configPIDGains(insideMotor, CollectorConstants.INSIDE_kP, CollectorConstants.INSIDE_kI, 
-                    CollectorConstants.INSIDE_kD, CollectorConstants.INSIDE_kF);
-        configPIDGains(outsideMotor, CollectorConstants.INSIDE_kP, CollectorConstants.INSIDE_kI, 
-                    CollectorConstants.INSIDE_kD, CollectorConstants.INSIDE_kF);
+        // initialiizeShuffleboard();
 
         CommandScheduler.getInstance().registerSubsystem(this);
     }
 
     /**
      * Sets the power of the collector motors
-     * 
+     * -1.0 <> 1.0
      * @param power the percent speed to set the collector motors to
      */
     public void setPercentPower(double power) {
-        insideMotor.set(TalonFXControlMode.PercentOutput, power);
-        outsideMotor.set(TalonFXControlMode.PercentOutput, power);
+        insideMotor.set(power);
+        outsideMotor.set(power);
     }
 
     /**
@@ -68,34 +66,37 @@ public class Collector extends SubsystemBase {
      * @param RPM the velocity to set the collector motors to in RPM
      */
     public void setRPM(double RPM) {
-        double ticks = (RPM / 600) * 2048;
-        insideMotor.set(TalonFXControlMode.Velocity, ticks);
-        outsideMotor.set(TalonFXControlMode.Velocity, ticks);
+        double RPS = RPM / 60; // TODO check
+
+        insideMotor.setControl(new VelocityVoltage(RPS, true, CollectorConstants.INSIDE_FF, 0, false));
+        outsideMotor.setControl(new VelocityVoltage(RPS, true, CollectorConstants.OUTSIDE_FF, 0, false));
     }
 
     /**
      * Sets the power of the Inside collector motor
-     * 
+     * -1.0 <> 1.0
      * @param power the percent speed to set the inside collector motor to
      */
     public void setInsidePower(double power) {
-        insideMotor.set(TalonFXControlMode.PercentOutput, power);
+        insideMotor.set(power);
     }
 
     /**
      * Sets the power of the Outside collector motor
-     * 
+     * -1.0 <> 1.0
      * @param power the percent speed to set the outside collector motor to
      */
     public void setOutsidePower(double power) {
-        outsideMotor.set(TalonFXControlMode.PercentOutput, power);
+        outsideMotor.set(power);
     }
 
     // Method to start logging
     @SuppressWarnings("unchecked")
     private void initialiizeShuffleboard() {
         periodicShuffleboard = new LightningShuffleboardPeriodic("Collector", CollectorConstants.LOG_PERIOD,
-            new Pair<String, Object>("Collector motor output percent", (DoubleSupplier) () -> insideMotor.getMotorOutputPercent()));
+            new Pair<String, Object>("Collector motor output percent", (DoubleSupplier) () -> insideMotor.get()),
+            new Pair<String, Object>("Collector RPM", (DoubleSupplier) () -> getCurrentRPM()),
+            new Pair<String, Object>("Is Stalling", (BooleanSupplier) () -> isStalling()));
     }
 
     /**
@@ -105,10 +106,10 @@ public class Collector extends SubsystemBase {
      */
     public void setSupplyCurrentLimit(int supplyCurrentLimit) {
         if (supplyCurrentLimit != currSupplyCurrentLimit) {
-            insideMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true,
-                    supplyCurrentLimit, supplyCurrentLimit, .25), 250);
-            outsideMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true,
-                    supplyCurrentLimit, supplyCurrentLimit, .25), 250);
+            // insideMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true,
+            //         supplyCurrentLimit, supplyCurrentLimit, .25), 10);
+            // outsideMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true,
+            //         supplyCurrentLimit, supplyCurrentLimit, .25), 10);
             // TODO Threshold needs testing, tigger threshold timer (s) , Timeout for application (ms)
         }
         currStatorCurrentLimit = supplyCurrentLimit;
@@ -121,10 +122,10 @@ public class Collector extends SubsystemBase {
      */
     public void setStatorCurrentLimit(int statorLimit) {
         if (statorLimit != currStatorCurrentLimit) {
-            insideMotor.configStatorCurrentLimit(
-                    new StatorCurrentLimitConfiguration(true, statorLimit, statorLimit, .25), 250);
-            outsideMotor.configStatorCurrentLimit(
-                    new StatorCurrentLimitConfiguration(true, statorLimit, statorLimit, .25), 250);
+            // insideMotor.configStatorCurrentLimit();
+            //         new StatorCurrentLimitConfiguration(true, statorLimit, statorLimit, .25), 250);
+            // outsideMotor.configStatorCurrentLimit(
+            //         new StatorCurrentLimitConfiguration(true, statorLimit, statorLimit, .25), 250);
         }
         currStatorCurrentLimit = statorLimit;
     }
@@ -134,8 +135,8 @@ public class Collector extends SubsystemBase {
      * Returns true if the collector is stalling
      */
     public boolean isStalling() {
-        return (insideMotor.getStatorCurrent() > CollectorConstants.STALL_POWER)
-            || (outsideMotor.getStatorCurrent() > CollectorConstants.STALL_POWER); // TODO Test Amount and type Stator vs Supply
+        return ( insideMotor.getTorqueCurrent().getValue() > CollectorConstants.STALL_POWER)
+            || (outsideMotor.getTorqueCurrent().getValue() > CollectorConstants.STALL_POWER); // TODO Test Amount and type Stator vs torque
     }
 
     /**
@@ -152,36 +153,32 @@ public class Collector extends SubsystemBase {
         this.gamePiece = gamePiece;
     }
 
-    public void setCoastMode() {
-        insideMotor.setNeutralMode(NeutralMode.Coast);
-        outsideMotor.setNeutralMode(NeutralMode.Coast);
+    public void setCoastMode() { //TODO see if possible probably not nessecary
+
+        // insideMotor.setNeutralMode(NeutralModeValue.Coast);
+        // outsideMotor.setNeutralMode(NeutralModeValue.Coast);
     }
 
-    public void setBrakeMode() {
-        insideMotor.setNeutralMode(NeutralMode.Brake);
-        outsideMotor.setNeutralMode(NeutralMode.Brake);
+    public void setBrakeMode() { //TODO see if possible probably not nessecary
+        // insideMotor.setNeutralMode(NeutralModeValue.Brake);
+        // outsideMotor.setNeutralModeValue(NeutralModeValue.Brake);
     }
 
-    public double currentEncoderTicks(TalonFX motor) {
-		return motor.getSelectedSensorPosition();
-	}
-
-    public double getCurrentRPM(TalonFX motor) {
-		return motor.getSelectedSensorVelocity() / 2048 * 600; //converts from revs per second to revs per minute
-	}
-
-    private void configPIDGains(TalonFX motor, double kP, double kI, double kD, double kV) {
-		motor.config_kP(0, kP);
-		motor.config_kI(0, kI);
-		motor.config_kD(0, kD);
-		motor.config_kF(0, kV);
+    /**
+     * gets current RPM from internal encoders
+     * @return average RPM of collector
+     */
+    public double getCurrentRPM() {
+        // Starts in RPS
+		return ((insideMotor.getVelocity().getValue() * 60) + (outsideMotor.getVelocity().getValue() * 60)) / 2; //converts from revs per second to revs per minute
 	}
 
     /**
      * stop Sets the power of the collector motor to 0
      */
     public void stop() {
-        setPercentPower(0d);
+        insideMotor.stopMotor();
+        outsideMotor.stopMotor();
     }
 
     @Override
@@ -189,21 +186,20 @@ public class Collector extends SubsystemBase {
 
         periodicShuffleboard.loop();
 
-        insideMotor.config_kP(0, LightningShuffleboard.getDouble("Collector", "INSIDE_kP", CollectorConstants.INSIDE_kP));
-        insideMotor.config_kP(0, LightningShuffleboard.getDouble("Collector", "INSIDE_kI", CollectorConstants.INSIDE_kI));
-        insideMotor.config_kP(0, LightningShuffleboard.getDouble("Collector", "INSIDE_kD", CollectorConstants.INSIDE_kD));
-        insideMotor.config_kP(0, LightningShuffleboard.getDouble("Collector", "INSIDE_kF", CollectorConstants.INSIDE_kF));
+        // insideMotor.config_kP(0, LightningShuffleboard.getDouble("Collector", "INSIDE_kP", CollectorConstants.INSIDE_kP));
+        // insideMotor.config_kP(0, LightningShuffleboard.getDouble("Collector", "INSIDE_kI", CollectorConstants.INSIDE_kI));
+        // insideMotor.config_kP(0, LightningShuffleboard.getDouble("Collector", "INSIDE_kD", CollectorConstants.INSIDE_kD));
+        // insideMotor.config_kP(0, LightningShuffleboard.getDouble("Collector", "INSIDE_kF", CollectorConstants.INSIDE_kF));
 
-        outsideMotor.config_kP(0, LightningShuffleboard.getDouble("Collector", "OUTSIDE_kP", CollectorConstants.INSIDE_kP));
-        outsideMotor.config_kP(0, LightningShuffleboard.getDouble("Collector", "OUTSIDE_kI", CollectorConstants.INSIDE_kI));
-        outsideMotor.config_kP(0, LightningShuffleboard.getDouble("Collector", "OUTSIDE_kD", CollectorConstants.INSIDE_kD));
-        outsideMotor.config_kP(0, LightningShuffleboard.getDouble("Collector", "OUTSIDE_kF", CollectorConstants.INSIDE_kF));
+        // outsideMotor.config_kP(0, LightningShuffleboard.getDouble("Collector", "OUTSIDE_kP", CollectorConstants.INSIDE_kP));
+        // outsideMotor.config_kP(0, LightningShuffleboard.getDouble("Collector", "OUTSIDE_kI", CollectorConstants.INSIDE_kI));
+        // outsideMotor.config_kP(0, LightningShuffleboard.getDouble("Collector", "OUTSIDE_kD", CollectorConstants.INSIDE_kD));
+        // outsideMotor.config_kP(0, LightningShuffleboard.getDouble("Collector", "OUTSIDE_kF", CollectorConstants.INSIDE_kF));
 
-        LightningShuffleboard.setDouble("Collector", "INSIDE_RPM", getCurrentRPM(insideMotor));
-        LightningShuffleboard.setDouble("Collector", "OUTSIDE_RPM", getCurrentRPM(outsideMotor));
+        LightningShuffleboard.setDouble("Collector", "RPM", getCurrentRPM());
 
-        LightningShuffleboard.setDouble("Collector", "INSIDE_Ticks", currentEncoderTicks(insideMotor));
-        LightningShuffleboard.setDouble("Collector", "OUTSIDE_Ticks", currentEncoderTicks(outsideMotor));
+        // LightningShuffleboard.setDouble("Collector", "INSIDE_Ticks", currentEncoderTicks(insideMotor));
+        // LightningShuffleboard.setDouble("Collector", "OUTSIDE_Ticks", currentEncoderTicks(outsideMotor));
 
         setRPM(LightningShuffleboard.getDouble("Collector", "Set RPM", 0));
     }
