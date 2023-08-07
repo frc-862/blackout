@@ -34,7 +34,8 @@ public class Music extends SubsystemBase {
 			"song8.chrp", 
 			"song9.chrp", /* the remaining songs play better with three or more FXs */
 			"song10.chrp", 
-			"song11.chrp",};
+			"song11.chrp",
+      "Megolavania.chrp"};
 
 	/** Creates a new Music. */
 	public Music() {
