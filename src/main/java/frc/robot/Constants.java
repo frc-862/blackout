@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-// import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.SparkMaxLimitSwitch;

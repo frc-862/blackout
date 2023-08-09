@@ -27,7 +27,7 @@ public class Shoot extends CommandBase {
 
 	@Override
 	public void execute() {
-		if(wrist.getGoalState() == wrist.getCurrState()) {
+		if(wrist.getGoalState() == wrist.getCurrState() && wrist.onTarget()) {
 			targetRPM = WristAngles.shootSpeedMap().get(wrist.getCurrState());
 			collector.setRPM(targetRPM);
 		}

@@ -3,18 +3,13 @@ package frc.robot;
 import frc.robot.subsystems.Collector;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.LimelightFront;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-// import frc.robot.subsystems.ServoTurn;
 import frc.robot.subsystems.Wrist;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.AutoAlignConstants;
 import frc.robot.Constants.AutonomousConstants;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.GamePiece;
@@ -31,6 +26,7 @@ import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.WristAngles.wristStates;
 import frc.thunder.auto.Autonomous;
 import frc.thunder.auto.AutonomousCommandFactory;
+import frc.thunder.pathplanner.com.pathplanner.lib.PathConstraints;
 import frc.thunder.testing.SystemTest;
 
 public class RobotContainer extends LightningContainer {
@@ -107,12 +103,26 @@ public class RobotContainer extends LightningContainer {
     @Override
     protected void configureAutonomousCommands() {
         // EXAMPLE
-        // autoFactory.makeTrajectory("NAME", Maps.getPathMap(drivetrain, servoturn, lift,
-        // collector, leds, arm),
-        // new PathConstraints(AutonomousConstants.MAX_VELOCITY,
-        // AutonomousConstants.MAX_ACCELERATION));
+        // autoFactory.makeTrajectory("NAME", Maps.getPathMap(drivetrain, servoturn, lift, collector, leds, arm), 
+        // new PathConstraints(AutonomousConstants.MAX_VELOCITY, AutonomousConstants.MAX_ACCELERATION));
 
+        // A PATHS 
+        autoFactory.makeTrajectory("A2[3]-M-BACK", Maps.getPathMap(drivetrain, collector, frontLimelight, wrist), 
+                new PathConstraints(AutonomousConstants.MAX_VELOCITY, AutonomousConstants.MAX_ACCELERATION));
 
+        // B PATHS
+        autoFactory.makeTrajectory("B2[1]-C-LOW", Maps.getPathMap(drivetrain, collector, frontLimelight, wrist), 
+                new PathConstraints(AutonomousConstants.MAX_VELOCITY, AutonomousConstants.MAX_ACCELERATION));
+        autoFactory.makeTrajectory("B2[1]-M-C-LOW", Maps.getPathMap(drivetrain, collector, frontLimelight, wrist), 
+                new PathConstraints(AutonomousConstants.MAX_VELOCITY, AutonomousConstants.MAX_ACCELERATION));
+        autoFactory.makeTrajectory("B2[1]-M-C-HIGH", Maps.getPathMap(drivetrain, collector, frontLimelight, wrist), 
+                new PathConstraints(AutonomousConstants.MAX_VELOCITY, AutonomousConstants.MAX_ACCELERATION));
+
+        // C PATHS
+        autoFactory.makeTrajectory("C2[2]-M-M-H", Maps.getPathMap(drivetrain, collector, frontLimelight, wrist), 
+                new PathConstraints(AutonomousConstants.MAX_VELOCITY, AutonomousConstants.MAX_ACCELERATION));
+
+        
         // ANYWHERE
         Autonomous.register("ruh roh flick auto", new InstantCommand()); // Emergency Auton that doesn't drive
     }
