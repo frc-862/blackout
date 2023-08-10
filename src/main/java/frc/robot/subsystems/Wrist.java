@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.StrictFollower;
@@ -40,12 +41,12 @@ public class Wrist extends SubsystemBase {
     private double targetAngle;
 
     public Wrist() {
-        leftMotor = FalconConfig.createMotor(CAN.LEFT_WRIST_MOTOR, WristConstants.LEFT_MOTOR_INVERT,
+        leftMotor = FalconConfig.createMotor(CAN.LEFT_WRIST_MOTOR, "rio", WristConstants.LEFT_MOTOR_INVERT,
                 WristConstants.SUPPLY_CURRENT_LIMIT, WristConstants.STATOR_CURRENT_LIMIT,
                 WristConstants.NEUTRAL_MODE, WristConstants.UP_kP, WristConstants.UP_kI, WristConstants.UP_kD,
                 WristConstants.DOWN_kP, WristConstants.DOWN_kI, WristConstants.DOWN_kD);
 
-        rightMotor = FalconConfig.createMotor(CAN.RIGHT_WRIST_MOTOR,
+        rightMotor = FalconConfig.createMotor(CAN.RIGHT_WRIST_MOTOR, "rio",
                 WristConstants.RIGHT_MOTOR_INVERT, WristConstants.SUPPLY_CURRENT_LIMIT,
                 CollectorConstants.STATOR_CURRENT_LIMIT, WristConstants.NEUTRAL_MODE, WristConstants.UP_kP, WristConstants.UP_kI, WristConstants.UP_kD,
                 WristConstants.DOWN_kP, WristConstants.DOWN_kI, WristConstants.DOWN_kD);
@@ -106,6 +107,10 @@ public class Wrist extends SubsystemBase {
         return goalState;
     }
 
+    public boolean onTarget() {
+        return (getAngle().getDegrees() - targetAngle) < WristConstants.WRIST_TOLERANCE;
+    }
+
     public void periodic() {
         if (currState != goalState) {
             setTargetAngle(WristAngles.angleMap().get(goalState));
@@ -129,10 +134,10 @@ public class Wrist extends SubsystemBase {
             if (targetAngle - currentAngle > 0) {
                 // PIDOutput = upController.calculate(currentAngle, targetAngle);
                 //TODO Figure out convertion from dergrees to rotations
-                leftMotor.setControl(new PositionVoltage(targetAngle, true, WristConstants.UP_FF, 0, false));
+                leftMotor.setControl(new PositionVoltage(targetAngle, false, WristConstants.UP_FF, 0, false));
                 
             } else {
-                leftMotor.setControl(new PositionVoltage(targetAngle, true, WristConstants.DOWN_FF, 1, false));
+                leftMotor.setControl(new PositionVoltage(targetAngle, false, WristConstants.DOWN_FF, 1, false));
             }
         } else {
             stop();

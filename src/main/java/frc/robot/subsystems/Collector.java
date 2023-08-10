@@ -33,12 +33,12 @@ public class Collector extends SubsystemBase {
 
     public Collector() {
         // Create the motor and configure it
-        insideMotor = FalconConfig.createMotor(CAN.INSIDE_COLLECTOR_MOTOR,
+        insideMotor = FalconConfig.createMotor(CAN.INSIDE_COLLECTOR_MOTOR, "rio",
                 CollectorConstants.INSIDE_MOTOR_INVERT, CollectorConstants.SUPPLY_CURRENT_LIMIT,
                 CollectorConstants.STATOR_CURRENT_LIMIT, CollectorConstants.NEUTRAL_MODE,
                 CollectorConstants.INSIDE_kP, CollectorConstants.INSIDE_kI, 
                 CollectorConstants.INSIDE_kD);
-        outsideMotor = FalconConfig.createMotor(CAN.OUTSIDE_COLLECTOR_MOTOR,
+        outsideMotor = FalconConfig.createMotor(CAN.OUTSIDE_COLLECTOR_MOTOR, "rio", 
                 CollectorConstants.OUTSIDE_MOTOR_INVERT, CollectorConstants.SUPPLY_CURRENT_LIMIT,
                 CollectorConstants.STATOR_CURRENT_LIMIT, CollectorConstants.NEUTRAL_MODE,
                 CollectorConstants.OUTSIDE_kP, CollectorConstants.OUTSIDE_kI, 
@@ -68,8 +68,8 @@ public class Collector extends SubsystemBase {
     public void setRPM(double RPM) {
         double RPS = RPM / 60; // TODO check
 
-        insideMotor.setControl(new VelocityVoltage(RPS, true, CollectorConstants.INSIDE_FF, 0, false));
-        outsideMotor.setControl(new VelocityVoltage(RPS, true, CollectorConstants.OUTSIDE_FF, 0, false));
+        insideMotor.setControl(new VelocityVoltage(RPS, false, CollectorConstants.INSIDE_FF, 0, false));
+        outsideMotor.setControl(new VelocityVoltage(RPS, false, CollectorConstants.OUTSIDE_FF, 0, false));
     }
 
     /**
@@ -184,7 +184,7 @@ public class Collector extends SubsystemBase {
     @Override
     public void periodic() {
 
-        periodicShuffleboard.loop();
+        // periodicShuffleboard.loop();
 
         // insideMotor.config_kP(0, LightningShuffleboard.getDouble("Collector", "INSIDE_kP", CollectorConstants.INSIDE_kP));
         // insideMotor.config_kP(0, LightningShuffleboard.getDouble("Collector", "INSIDE_kI", CollectorConstants.INSIDE_kI));

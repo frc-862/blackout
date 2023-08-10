@@ -205,6 +205,8 @@ public final class Constants {
 
         public static final NeutralModeValue NEUTRAL_MODE = NeutralModeValue.Brake;
 
+        public static final double WRIST_TOLERANCE = 4d;
+
         // PID gains for our wrist going up and down
         public static final double UP_kP = 0.0079d;
         public static final double UP_kI = 0.0d;
