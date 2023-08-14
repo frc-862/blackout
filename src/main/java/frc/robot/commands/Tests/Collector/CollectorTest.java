@@ -19,7 +19,7 @@ public class CollectorTest extends CommandBase {
 
 	@Override
 	public void initialize() {
-		collector.setPercentPower(0d);
+		collector.stop();
 		collector.setCoastMode();
 	}
 
@@ -35,8 +35,13 @@ public class CollectorTest extends CommandBase {
 	// Called once the command ends or is interrupted.
 	@Override
 	public void end(boolean interrupted) {
-		collector.setPercentPower(0d);
+		collector.stop();
 		collector.setBrakeMode();
+	}
+
+	@Override
+	public boolean isFinished() {
+		return power >= maxPower;
 	}
 
 }

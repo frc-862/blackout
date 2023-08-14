@@ -3,7 +3,6 @@ package frc.robot;
 import frc.robot.subsystems.Collector;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.LimelightFront;
@@ -16,7 +15,7 @@ import frc.robot.Constants.GamePiece;
 import frc.robot.commands.AutoBalance;
 import frc.robot.commands.Collect;
 import frc.robot.commands.SwerveDrive;
-import frc.robot.commands.Tests.Collector.CollectorTest;
+import frc.robot.commands.Tests.Collector.CollectorSystemTest;
 import frc.robot.commands.Tests.Drive.DriveTrainSystemTest;
 import frc.robot.commands.HoldPower;
 import frc.robot.commands.Shoot;
@@ -46,8 +45,6 @@ public class RobotContainer extends LightningContainer {
             new XboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
     private static final XboxController copilot =
             new XboxController(ControllerConstants.COPILOT_CONTROLLER_PORT);
-    private static final Joystick buttonPad =
-            new Joystick(ControllerConstants.BUTTON_PAD_CONTROLLER_PORT);
 
     // creates Autonomous Command
     private static final AutonomousCommandFactory autoFactory =
@@ -97,6 +94,9 @@ public class RobotContainer extends LightningContainer {
         // DISABLE LIFT
         new Trigger(() -> copilot.getStartButton() && copilot.getBackButton()).onTrue(new InstantCommand(wrist::disableWrist));
 
+        //BIAS
+        new Trigger(() -> copilot.getPOV() == 0).onTrue(new InstantCommand(() -> wrist.adjustWrist(10d)));
+        new Trigger(() -> copilot.getPOV() == 180).onTrue(new InstantCommand(() -> wrist.adjustWrist(-10d)));
     }
 
     // Creates the autonomous commands
@@ -167,7 +167,7 @@ public class RobotContainer extends LightningContainer {
         SystemTest.registerTest("br drive test",
                 new DriveTrainSystemTest(drivetrain, drivetrain.getBackRightModule(), 0.25));
 
-        SystemTest.registerTest("Collector test", new CollectorTest(collector, 1d));
+        SystemTest.registerTest("Collector test", new CollectorSystemTest(collector, 1d, 5500));
     }
 
     @Override

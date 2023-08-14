@@ -3,15 +3,15 @@ package frc.robot.commands.Tests.Collector;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Collector;
 
-public class CollectorOutsideTest extends CommandBase {
+public class CollectorRPMTest extends CommandBase {
 
 	Collector collector;
-	double maxpower;
-	double power = 0d;
+	double maxRPM;
+	double RPM = 0d;
 
-	public CollectorOutsideTest(Collector collector, double maxpower) {
+	public CollectorRPMTest(Collector collector, double maxRPM) {
 		this.collector = collector;
-		this.maxpower = maxpower;
+		this.maxRPM = maxRPM;
 
 		addRequirements(collector);
 	}
@@ -19,23 +19,28 @@ public class CollectorOutsideTest extends CommandBase {
 	// Called when the command is initially scheduled.
 	@Override
 	public void initialize() {
-		collector.setPercentPower(0d);
+		collector.stop();
 		collector.setCoastMode();
 	}
 
 	// Called every time the scheduler runs while the command is scheduled.
 	@Override
 	public void execute() {
-		if (power < maxpower) {
-			power += 0.05d;
+		if (RPM <= maxRPM) {
+			RPM += 50d;
 		}
-		collector.setOutsidePower(power);
+		collector.setRPM(RPM);
 	}
 
 	// Called once the command ends or is interrupted.
 	@Override
 	public void end(boolean interrupted) {
-		collector.setPercentPower(0d);
+		collector.stop();
 		collector.setBrakeMode();
+	}
+
+	@Override
+	public boolean isFinished(){
+		return RPM >= maxRPM;
 	}
 }

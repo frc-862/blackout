@@ -55,12 +55,12 @@ public class HoldPower extends CommandBase {
         }
 
         if (input.getAsDouble() < 0) {
-            collector.setSupplyCurrentLimit(60);
+            collector.setCurrentLimit(60);
         } else if (input.getAsDouble() > 0 && collector.getGamePiece() == GamePiece.CONE) {
-            collector.setSupplyCurrentLimit(50);
+            collector.setCurrentLimit(50);
         } else {
-            collector.setSupplyCurrentLimit(CollectorConstants.STATOR_CURRENT_LIMIT); // TODO Check
-                                                                                      // if correct
+            collector.setCurrentLimit(CollectorConstants.CURRENT_LIMIT); // TODO Check
+                                                                                // if correct
         }
 
         if (DriverStation.isTeleop()) {
@@ -75,7 +75,7 @@ public class HoldPower extends CommandBase {
                 driver.setRumble(RumbleType.kBothRumble, 0);
                 copilot.setRumble(RumbleType.kBothRumble, 0);
             }
-            
+
             collector.setPercentPower(power);
         }
     }

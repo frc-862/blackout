@@ -2,12 +2,9 @@ package frc.robot;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.ctre.phoenix6.controls.NeutralOut;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.SparkMaxLimitSwitch;
 
 import edu.wpi.first.math.Matrix;
@@ -19,7 +16,6 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj2.command.Command;
 import frc.thunder.math.InterpolationMap;
 import frc.thunder.pathplanner.com.pathplanner.lib.auto.PIDConstants;
 
@@ -166,16 +162,14 @@ public final class Constants {
 
 
     public static final class CollectorConstants {
-        public static final boolean INSIDE_MOTOR_INVERT = false;
-        public static final boolean OUTSIDE_MOTOR_INVERT = false;
+        public static final boolean MOTOR_INVERT = false;
 
-        public static final int SUPPLY_CURRENT_LIMIT = 40;
-        public static final int STATOR_CURRENT_LIMIT = 30;
+        public static final int CURRENT_LIMIT = 40;
 
         public static final double HOLD_POWER_CUBE = 0.25;
         public static final double HOLD_POWER_CONE = 0.65;
         public static final MotorType MOTOR_TYPE = MotorType.kBrushless;
-        public static final NeutralModeValue NEUTRAL_MODE = NeutralModeValue.Brake;
+        public static final IdleMode IDLE_MODE = IdleMode.kCoast;
 
         public static final double STALL_POWER = 35d; // Used to detect wether or not the collector
                                                       // is stalling meaning it has a game piece
@@ -183,27 +177,22 @@ public final class Constants {
 
         public static final double LOG_PERIOD = 0.22;
 
-        public static final double INSIDE_kP = 0.01; // TODO NEED THESE
-        public static final double INSIDE_kD = 0.01;
-        public static final double INSIDE_kI = 0.01;
-        public static final double INSIDE_FF = 0.01;
+        public static final double MOTOR_kP = 0.01d; // TODO NEED THESE
+        public static final double MOTOR_kI = 0.00d;
+        public static final double MOTOR_kD = 0.01d;
 
-        public static final double OUTSIDE_kP = 0.01;
-        public static final double OUTSIDE_kD = 0.01;
-        public static final double OUTSIDE_kI = 0.01;
-        public static final double OUTSIDE_FF = 0.01;
+        public static final double MAX_RPM = 5820;
     }
 
     public static final class WristConstants {
 
         // Motor configuration constants
-        public static final boolean RIGHT_MOTOR_INVERT = true; // TODO Check
-        public static final boolean LEFT_MOTOR_INVERT = true; // TODO Check
+        public static final boolean MOTOR_INVERT = true; // TODO Check
 
-        public static final int SUPPLY_CURRENT_LIMIT = 40;
-        public static final int STATOR_CURRENT_LIMIT = 40;
+        public static final int CURRENT_LIMIT = 40;
 
-        public static final NeutralModeValue NEUTRAL_MODE = NeutralModeValue.Brake;
+        public static final IdleMode IDLE_MODE = IdleMode.kBrake;
+        public static final MotorType MOTOR_TYPE = MotorType.kBrushless;
 
         public static final double WRIST_TOLERANCE = 4d;
 
@@ -211,13 +200,11 @@ public final class Constants {
         public static final double UP_kP = 0.0079d;
         public static final double UP_kI = 0.0d;
         public static final double UP_kD = 0.0001d;
-        public static final double UP_FF = 0.0d;
 
 
         public static final double DOWN_kP = 0.006d;
         public static final double DOWN_kI = 0d;
         public static final double DOWN_kD = 0d;
-        public static final double DOWN_FF = 0d;
 
         // Tolernace for our wrist
         public static final double TOLERANCE = 12d;
@@ -233,8 +220,7 @@ public final class Constants {
         public static final double LOG_PERIOD = 0.24;
 
         // Offsets in degrees
-        public static final double RIGHT_OFFSET = 0d; // TODO GET NEW
-        public static final double LEFT_OFFSET = 0d;
+        public static final double OFFSET = 0d; // TODO GET NEW
 
         // Conversion factor for our wrist, multiply this by the navite units to get degrees
         public static final double POSITION_CONVERSION_FACTOR = 360; // TODO check
@@ -281,12 +267,10 @@ public final class Constants {
             public static final int BACK_LEFT_CANCODER = 34;
 
             // COLLECTOR
-            public static final int INSIDE_COLLECTOR_MOTOR = 9; // TODO get Real
-            public static final int OUTSIDE_COLLECTOR_MOTOR = 10; // TODO GET REAL
-
+            public static final int COLLECTOR_MOTOR = 9; // TODO get Real
             // WRIST
-            public static final int RIGHT_WRIST_MOTOR = 11; // TODO get Real
-            public static final int LEFT_WRIST_MOTOR = 12; // TODO get Real
+            public static final int WRIST_MOTOR = 10; // TODO get Real
+        
 
             // CANdle
             public static final int CANDLE = 22;
