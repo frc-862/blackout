@@ -17,25 +17,19 @@ public class Music extends SubsystemBase {
 	TalonFX motor3 = new TalonFX(CAN.INSIDE_COLLECTOR_MOTOR);
 	TalonFX motor4 = new TalonFX(CAN.OUTSIDE_COLLECTOR_MOTOR);
 
-	private int currentSong = -1;
-	private int songRequest = -1;
+	private int currentSong = 0;
+	private int songRequest = 0;
 
-	private int timeToPlayLoops = -1; 
+	private int timeToPlayLoops = -1;
 
 	// An array of songs that are available to be played, can you guess the song/artists?
 	String[] songs = new String[] {
-			"song1.chrp", 
-			"song2.chrp", 
-			"song3.chrp", 
-			"song4.chrp", 
-			"song5.chrp", 
-			"song6.chrp",
-			"song7.chrp", 
-			"song8.chrp", 
-			"song9.chrp", /* the remaining songs play better with three or more FXs */
-			"song10.chrp", 
-			"song11.chrp",
-      "Megolavania.chrp"};
+			"song1.chrp", "song2.chrp", "song3.chrp", "song4.chrp", "song5.chrp", "song6.chrp",
+			"song7.chrp", "song8.chrp", "song9.chrp", /*
+														 * the remaining songs play better with
+														 * three or more FXs
+														 */
+			"song10.chrp", "song11.chrp", "Megolavania.chrp"};
 
 	/** Creates a new Music. */
 	public Music() {
@@ -47,27 +41,41 @@ public class Music extends SubsystemBase {
 
 		orchestra = new Orchestra(instruments);
 
-		orchestra.loadMusic(songs[0]);
+		orchestra.loadMusic(songs[currentSong]);
 	}
 
 	@Override
 	public void periodic() {
 
-		if(songRequest != currentSong) {
+		if (songRequest != currentSong) {
+			// orchestra.pause();
 			orchestra.loadMusic(songs[songRequest]);
+			// try {
+			// 	orchestra.wait(40);
+			// } catch (InterruptedException e) {
+			// 	// TODO Auto-generated catch block
+			// 	e.printStackTrace();
+			// }
+			currentSong = songRequest;
+			// orchestra.play();
+			System.out.println("MADE IT TO NEW SONG");
 		}
 
-		if (timeToPlayLoops > 0) {
-            --timeToPlayLoops;
-			if (timeToPlayLoops == 0) {
-            	toggle();
-            }
-		}
+		// if (timeToPlayLoops > 0) {
+		// --timeToPlayLoops;
+		// if (timeToPlayLoops == 0) {
+		// toggle();
+		// }
+		// }
 		LightningShuffleboard.setString("Music", "Current Song", songs[currentSong]);
+		LightningShuffleboard.setBool("Music", "Is playing", orchestra.isPlaying());
+		LightningShuffleboard.setDouble("Music", "Current song", currentSong);
+		LightningShuffleboard.setDouble("Music", "Requested song", songRequest);
+		// LightningShuffleboard
 	}
 
 	public void toggle() {
-		if(orchestra.isPlaying()){
+		if (orchestra.isPlaying()) {
 			orchestra.pause();
 		} else {
 			orchestra.play();
@@ -80,8 +88,8 @@ public class Music extends SubsystemBase {
 	}
 
 	public void nextTrack() {
-		songRequest = currentSong++;
-		if(songRequest >= songs.length){
+		songRequest = currentSong + 1;
+		if (songRequest >= songs.length) {
 			songRequest = 0;
 		}
 
@@ -89,14 +97,13 @@ public class Music extends SubsystemBase {
 	}
 
 	public void previousTrack() {
-		songRequest = currentSong--;
-		if(songRequest < 0){
+		songRequest = currentSong - 1;
+		if (songRequest < 0) {
 			songRequest = songs.length - 1;
 		}
 
 		timeToPlayLoops = 10;
 	}
-
 
 
 

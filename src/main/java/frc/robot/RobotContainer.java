@@ -51,7 +51,7 @@ public class RobotContainer extends LightningContainer {
     // Creates our controllers and deadzones
     private static final XboxController driver = new XboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
     private static final XboxController copilot = new XboxController(ControllerConstants.COPILOT_CONTROLLER_PORT);
-    private static final Joystick buttonPad = new Joystick(ControllerConstants.BUTTON_PAD_CONTROLLER_PORT);
+    // private static final Joystick buttonPad = new Joystick(ControllerConstants.BUTTON_PAD_CONTROLLER_PORT);
 
     // creates Autonomous Command
     private static final AutonomousCommandFactory autoFactory = new AutonomousCommandFactory(drivetrain::getPose, drivetrain::resetOdometry, drivetrain.getDriveKinematics(),
@@ -112,10 +112,13 @@ public class RobotContainer extends LightningContainer {
          * Button 3 Previous Track
          */
 
-        new Trigger(() -> buttonPad.getRawButton(0)).onTrue(new InstantCommand(() -> music.toggle()));
-        new Trigger(() -> buttonPad.getRawButton(1)).onTrue(new InstantCommand(() -> music.nextTrack()));
-        new Trigger(() -> buttonPad.getRawButton(2)).onTrue(new InstantCommand(() -> music.previousTrack()));
+        // new Trigger(() -> buttonPad.getRawButton(0)).onTrue(new InstantCommand(() -> music.toggle()));
+        // new Trigger(() -> buttonPad.getRawButton(1)).onTrue(new InstantCommand(() -> music.nextTrack()));
+        // new Trigger(() -> buttonPad.getRawButton(2)).onTrue(new InstantCommand(() -> music.previousTrack()));
 
+        new Trigger(copilot::getAButton).onTrue(new InstantCommand(() -> music.toggle()));
+        new Trigger(copilot::getBButton).onTrue(new InstantCommand(() -> music.nextTrack()));
+        new Trigger(copilot::getXButton).onTrue(new InstantCommand(() -> music.previousTrack()));
     }
 
     // Creates the autonomous commands
