@@ -190,6 +190,7 @@ public final class Constants {
         public static final boolean MOTOR_INVERT = true; // TODO Check
 
         public static final int CURRENT_LIMIT = 40;
+        public static final int STALL_CURRENT = 30; // TODO GET AT zeroing speed
 
         public static final IdleMode IDLE_MODE = IdleMode.kBrake;
         public static final MotorType MOTOR_TYPE = MotorType.kBrushless;
@@ -221,6 +222,9 @@ public final class Constants {
 
         // Offsets in degrees
         public static final double OFFSET = 0d; // TODO GET NEW
+
+        // Zero speed 
+        public static final double ZERO_SPEED = 0.1d; // TODO test
 
         // Conversion factor for our wrist, multiply this by the navite units to get degrees
         public static final double POSITION_CONVERSION_FACTOR = 360; // TODO check
@@ -353,15 +357,9 @@ public final class Constants {
     // Constants for autonomous
     public static final class AutonomousConstants {
         // Path planner PIDConstants
-        public static final PIDConstants DRIVE_PID_CONSTANTS = new PIDConstants(2.5, 0, 0); // Drive
-                                                                                            // velocity
-                                                                                            // PID
-                                                                                            // 10.5
-        public static final PIDConstants THETA_PID_CONSTANTS = new PIDConstants(4, 0, 0); // Rotation
-                                                                                          // PID 7
-        public static final PIDConstants POSE_PID_CONSTANTS = new PIDConstants(0, 0, 0); // X and Y
-                                                                                         // position
-                                                                                         // PID
+        public static final PIDConstants DRIVE_PID_CONSTANTS = new PIDConstants(2.5, 0, 0); // Drive velocity PID 10.5
+        public static final PIDConstants THETA_PID_CONSTANTS = new PIDConstants(4, 0, 0); // Rotation PID 7
+        public static final PIDConstants POSE_PID_CONSTANTS = new PIDConstants(0, 0, 0); // X and Y position PID
 
         // Max velocity and acceleration for the path planner
         public static final double MAX_VELOCITY = 2;

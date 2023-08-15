@@ -34,6 +34,8 @@ public class Wrist extends SubsystemBase {
     private double currentAngle;
     private double targetAngle;
 
+    private double OFFSET = 0d;
+
     public Wrist() {
         motor = NeoConfig.createMotor(CAN.WRIST_MOTOR, WristConstants.MOTOR_INVERT, WristConstants.CURRENT_LIMIT, 
             Constants.VOLTAGE_COMPENSATION, WristConstants.MOTOR_TYPE, WristConstants.IDLE_MODE);
@@ -61,11 +63,11 @@ public class Wrist extends SubsystemBase {
      * @return Rotation2d of the wrist from encoder
      */
     public Rotation2d getAngle() { //TODO FIX CONVERSION factor
-        return Rotation2d.fromDegrees(MathUtil.inputModulus(motor.getEncoder().getPosition() * WristConstants.POSITION_CONVERSION_FACTOR - WristConstants.OFFSET, -180, 180));
+        return Rotation2d.fromDegrees(MathUtil.inputModulus(motor.getEncoder().getPosition() * WristConstants.POSITION_CONVERSION_FACTOR - OFFSET, -180, 180));
     }
 
-    public double getOffset() {
-        return motor.getEncoder().getPosition() * WristConstants.POSITION_CONVERSION_FACTOR + WristConstants.MIN_ANGLE;
+    public void setOffset() {
+        OFFSET = motor.getEncoder().getPosition() * WristConstants.POSITION_CONVERSION_FACTOR + WristConstants.MIN_ANGLE;
     }
     
     public void disableWrist() {
@@ -103,6 +105,19 @@ public class Wrist extends SubsystemBase {
 
     public void adjustWrist(double bias) {
         setTargetAngle(getAngle().getDegrees() + bias);
+    }
+
+    public void zero() {
+        if(!isStalling()){
+            motor.set(WristConstants.ZERO_SPEED);
+        } else {
+            stop();
+            setOffset();
+        }
+    }
+
+    public boolean isStalling(){
+        return motor.getOutputCurrent() >= WristConstants.STALL_CURRENT;
     }
 
     public void periodic() {
