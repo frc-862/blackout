@@ -154,15 +154,17 @@ public final class Constants {
 
     public static final class LimelightConstants {
         public static final String FRONT_NAME = "limelight-front";
-        public static final Pose3d FRONT_POSE = new Pose3d(.1, 0.28, 0.72, new Rotation3d(0, 0, 0)); // Position on robot
+        public static final Pose3d FRONT_POSE = new Pose3d(.1, 0.28, 0.72, new Rotation3d(0, 0, 0)); // Position
+                                                                                                     // on
+                                                                                                     // robot
         public static final double CUBE_OFFSET = 0.0; // TODO find this value
     }
 
-    public static final class AutoAlignConstants { 
+    public static final class AutoAlignConstants {
         public static final double RkP = 0.01d;
         public static final double RkI = 0.00d;
         public static final double RkD = 0.01d;
-        
+
         public static final double YkP = -0.05d;
         public static final double YkI = 0.00d;
         public static final double YkD = -0.03d;
@@ -176,10 +178,9 @@ public final class Constants {
     public static final class CollectorConstants {
         public static final boolean MOTOR_INVERT = false;
 
-        public static final int CURRENT_LIMIT = 40;
+        public static final int CURRENT_LIMIT = 0; // :P
 
-        public static final double HOLD_POWER_CUBE = 0.25;
-        public static final double HOLD_POWER_CONE = 0.65;
+        public static final double HOLD_POWER = 0.25;
         public static final MotorType MOTOR_TYPE = MotorType.kBrushless;
         public static final IdleMode IDLE_MODE = IdleMode.kBrake;
 
@@ -189,11 +190,17 @@ public final class Constants {
 
         public static final double LOG_PERIOD = 0.22;
 
-        public static final double MOTOR_kP = 0.01d; // TODO NEED THESE
-        public static final double MOTOR_kI = 0.00d;
-        public static final double MOTOR_kD = 0.01d;
+        // public static final double MOTOR_kP = 0.00d; // TODOnt NEED THESE
+        // public static final double MOTOR_kI = 0.00d;
+        // public static final double MOTOR_kD = 0.00d;
 
-        public static final double MAX_RPM = 5820;
+        // public static final double MOTOR_kS = 0.00d;
+        // public static final double MOTOR_kA = 0.00d;
+        // public static final double MOTOR_kV = 0.00d;
+
+
+
+        // public static final double MAX_RPM = 5820;
     }
 
     public static final class WristConstants {
@@ -224,7 +231,7 @@ public final class Constants {
         public static final double TOLERANCE = 12d;
 
         // Min/max angles in degrees
-        public static final double MAX_ANGLE = 121d; 
+        public static final double MAX_ANGLE = 121d;
         public static final double MIN_ANGLE = 0;
 
         // Min and Max power
@@ -236,7 +243,7 @@ public final class Constants {
         // Offsets in degrees
         public static final double OFFSET = 0d; // TODO GET NEW
 
-        // Zero speed 
+        // Zero speed
         public static final double ZERO_SPEED = 0.1d; // TODO test
 
         // Conversion factor for our wrist, multiply this by the navite units to get degrees
@@ -285,10 +292,10 @@ public final class Constants {
             public static final int BACK_LEFT_CANCODER = 34;
 
             // COLLECTOR
-            public static final int COLLECTOR_MOTOR = 10; 
+            public static final int COLLECTOR_MOTOR = 10;
             // WRIST
             public static final int WRIST_MOTOR = 9;
-        
+
             // CANdle
             public static final int CANDLE = 22;
         }
@@ -370,9 +377,15 @@ public final class Constants {
     // Constants for autonomous
     public static final class AutonomousConstants {
         // Path planner PIDConstants
-        public static final PIDConstants DRIVE_PID_CONSTANTS = new PIDConstants(2.5, 0, 0); // Drive velocity PID 10.5
-        public static final PIDConstants THETA_PID_CONSTANTS = new PIDConstants(4, 0, 0); // Rotation PID 7
-        public static final PIDConstants POSE_PID_CONSTANTS = new PIDConstants(0, 0, 0); // X and Y position PID
+        public static final PIDConstants DRIVE_PID_CONSTANTS = new PIDConstants(2.5, 0, 0); // Drive
+                                                                                            // velocity
+                                                                                            // PID
+                                                                                            // 10.5
+        public static final PIDConstants THETA_PID_CONSTANTS = new PIDConstants(4, 0, 0); // Rotation
+                                                                                          // PID 7
+        public static final PIDConstants POSE_PID_CONSTANTS = new PIDConstants(0, 0, 0); // X and Y
+                                                                                         // position
+                                                                                         // PID
 
         // Max velocity and acceleration for the path planner
         public static final double MAX_VELOCITY = 2;
@@ -463,13 +476,13 @@ public final class Constants {
             return angleMap;
         }
 
-        public static final HashMap<wristStates, Double> shootSpeedMap() { // TODO Get Speeds
-            HashMap<wristStates, Double> shootSpeedMap = new HashMap<>();
-            shootSpeedMap.put(wristStates.Stow, -99999d);
-            shootSpeedMap.put(wristStates.Ground, 100d);
-            shootSpeedMap.put(wristStates.MidCube, 1000d);
-            shootSpeedMap.put(wristStates.HighCube, 3000d);
-            return shootSpeedMap;
+        public static final HashMap<wristStates, Double> shootMap() { // TODO Get Speeds
+            HashMap<wristStates, Double> shootMap = new HashMap<>();
+            shootMap.put(wristStates.Stow, CollectorConstants.HOLD_POWER);
+            shootMap.put(wristStates.Ground, 0.25);
+            shootMap.put(wristStates.MidCube, 0.75);
+            shootMap.put(wristStates.HighCube, 1.0);
+            return shootMap;
         }
 
         public static enum wristStates {

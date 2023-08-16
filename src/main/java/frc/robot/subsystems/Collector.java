@@ -7,6 +7,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -29,7 +30,9 @@ public class Collector extends SubsystemBase {
 
     private GamePiece gamePiece = GamePiece.CUBE;
 
-    private PIDController RPMController = new PIDController(CollectorConstants.MOTOR_kP, CollectorConstants.MOTOR_kI, CollectorConstants.MOTOR_kD);
+    // private PIDController PIDController = new PIDController(CollectorConstants.MOTOR_kP, CollectorConstants.MOTOR_kI, CollectorConstants.MOTOR_kD);
+    // private double kS = CollectorConstants.MOTOR_kS;
+    // private double kV = CollectorConstants.MOTOR_kV;
 
     private int currCurrentLimit = CollectorConstants.CURRENT_LIMIT;
 
@@ -38,7 +41,7 @@ public class Collector extends SubsystemBase {
         motor = NeoConfig.createMotor(CAN.COLLECTOR_MOTOR, CollectorConstants.MOTOR_INVERT, CollectorConstants.CURRENT_LIMIT,
             Constants.VOLTAGE_COMPENSATION, CollectorConstants.MOTOR_TYPE, CollectorConstants.IDLE_MODE);
 
-        RPMController.setTolerance(50);
+        // PIDController.setTolerance(50);
         
         // Initialize the shuffleboard values and start logging data
         initialiizeShuffleboard();
@@ -60,10 +63,10 @@ public class Collector extends SubsystemBase {
      * 
      * @param RPM the velocity to set the collector motors to in RPM
      */
-    public void setRPM(double RPM) {
-        MathUtil.clamp(RPM, -CollectorConstants.MAX_RPM, CollectorConstants.MAX_RPM);
-        motor.setVoltage(RPMController.calculate(motor.getEncoder().getVelocity(), RPM));
-    }
+    // public void setRPM(double RPM) {
+    //     MathUtil.clamp(RPM, -CollectorConstants.MAX_RPM, CollectorConstants.MAX_RPM);
+    //     motor.setVoltage(PIDController.calculate(motor.getEncoder().getVelocity(), RPM));
+    // }
 
     // Method to start logging
     @SuppressWarnings("unchecked")
@@ -136,15 +139,23 @@ public class Collector extends SubsystemBase {
 
         periodicShuffleboard.loop();
 
-        RPMController.setP(LightningShuffleboard.getDouble("Collector", "kP", CollectorConstants.MOTOR_kP));
-        RPMController.setI(LightningShuffleboard.getDouble("Collector", "kI", CollectorConstants.MOTOR_kI));
-        RPMController.setD(LightningShuffleboard.getDouble("Collector", "kD", CollectorConstants.MOTOR_kD));
-    
+        // PIDController.setP(LightningShuffleboard.getDouble("Collector", "kP", CollectorConstants.MOTOR_kP));
+        // PIDController.setI(LightningShuffleboard.getDouble("Collector", "kI", CollectorConstants.MOTOR_kI));
+        // PIDController.setD(LightningShuffleboard.getDouble("Collector", "kD", CollectorConstants.MOTOR_kD));
+
+        // kS = LightningShuffleboard.getDouble("Collector", "kS", CollectorConstants.MOTOR_kS);
+        // kV = LightningShuffleboard.getDouble("Collector", "kV", CollectorConstants.MOTOR_kV);
+
+
+        // double FFOutput = kS * Math.signum(getCurrentRPM()) + kV * getCurrentRPM();
+
 
         LightningShuffleboard.setDouble("Collector", "Collector Amps", motor.getAppliedOutput());
         LightningShuffleboard.setDouble("Collector", "RPM", getCurrentRPM());
+        // LightningShuffleboard.setDouble("Collector", "Commanded Power", motor.get());
+
         // LightningShuffleboard.setDouble("Colletor", "",motor. );
 
-        setRPM(LightningShuffleboard.getDouble("Collector", "Set RPM", 0));
+        // setRPM(LightningShuffleboard.getDouble("Collector", "Set RPM", 0));
     }
 }

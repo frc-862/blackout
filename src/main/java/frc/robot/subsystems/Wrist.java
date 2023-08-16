@@ -74,6 +74,10 @@ public class Wrist extends SubsystemBase {
         stop();
         disableWrist = true;
     }
+
+    public void enableWrist() {
+        disableWrist = false;
+    }
     
     /**
      * Set power to both motors
@@ -116,6 +120,10 @@ public class Wrist extends SubsystemBase {
         
     }
 
+    public boolean getLimitSwitch() {
+        return motor.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen).isPressed();
+    }
+
     public void periodic() {
         if (currState != goalState) {
             setTargetAngle(WristAngles.angleMap().get(goalState));
@@ -138,7 +146,7 @@ public class Wrist extends SubsystemBase {
 
 
         // if (targetAngle - currentAngle > 0) {
-            PIDOutput = upController.calculate(getAngle().getDegrees(), targetAngle);
+        PIDOutput = upController.calculate(getAngle().getDegrees(), targetAngle);
         // } else {
         //     PIDOutput = downController.calculate(currentAngle, targetAngle);
         // }
@@ -154,7 +162,7 @@ public class Wrist extends SubsystemBase {
             stop();
         }
 
-        if (motor.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen).isPressed()) {
+        if (getLimitSwitch()) {
             OFFSET = 0;
             OFFSET = WristConstants.MAX_ANGLE - getAngle().getDegrees();
         }

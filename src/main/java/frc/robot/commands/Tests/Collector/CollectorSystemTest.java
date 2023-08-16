@@ -9,7 +9,7 @@ public class CollectorSystemTest extends SequentialCommandGroup {
 
 	public CollectorSystemTest(Collector collector, double maxPower, double maxRPM) {
 		super(new WaitCommand(2),
-			new TimedCommand(new CollectorRPMTest(collector, maxRPM), 5),
+			// new TimedCommand(new CollectorRPMTest(collector, maxRPM), 5),
 			new WaitCommand(1),
 			new TimedCommand(new CollectorTest(collector, maxPower), 5));
 	}

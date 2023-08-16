@@ -31,7 +31,8 @@ public class HoldPower extends CommandBase {
      * @param copilot Copilot Controller
      * @param Wrist The wrist subsystem
      */
-    public HoldPower(Collector collector, DoubleSupplier input, XboxController driver, XboxController copilot, Wrist wrist) {
+    public HoldPower(Collector collector, DoubleSupplier input, XboxController driver,
+            XboxController copilot, Wrist wrist) {
         this.collector = collector;
         this.input = input;
         this.driver = driver;
@@ -44,26 +45,27 @@ public class HoldPower extends CommandBase {
     @Override
     public void execute() {
         if (input.getAsDouble() > 0) { // Collector collects
+            wrist.setGoalState(wristStates.Ground);
             doHoldPower = true;
-            // wrist.setGoalState(wristStates.Ground);
             power = input.getAsDouble();
         } else if (input.getAsDouble() < 0) { // Collector spits
             doHoldPower = false;
             // wrist.setGoalState(wristStates.Ground);
             power = input.getAsDouble();
         } else if (doHoldPower) { // Hold power if no input and last input was inwards
-            // wrist.setGoalState(wristStates.Stow);
-            power = CollectorConstants.HOLD_POWER_CUBE;
+            wrist.setGoalState(wristStates.Stow);
+            power = CollectorConstants.HOLD_POWER;
         } else {
+            wrist.setGoalState(wristStates.Stow);
             power = 0;
-            // wrist.setGoalState(wristStates.Stow);
         }
 
-        if (input.getAsDouble() < 0) {
-            collector.setCurrentLimit(60);
-        } else {
-            collector.setCurrentLimit(CollectorConstants.CURRENT_LIMIT); // TODO Check if correct Current Limit
-        }
+        // if (input.getAsDouble() < 0) {
+        // collector.setCurrentLimit(60);
+        // } else {
+        // collector.setCurrentLimit(CollectorConstants.CURRENT_LIMIT); // TODO Check if correct
+        // Current Limit
+        // }
 
         if (DriverStation.isTeleop()) {
             if (collector.isStalling()) { // For Drivers to know when the piece is in

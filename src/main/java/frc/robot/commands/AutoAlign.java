@@ -16,7 +16,7 @@ public class AutoAlign extends CommandBase {
 	PIDController YController = new PIDController(AutoAlignConstants.YkP, AutoAlignConstants.YkI, AutoAlignConstants.YkD);
 
 	private double YOutput; 
-	private double ROutput;
+	private double ROutput = 0;
 
 	public AutoAlign(Drivetrain drivetrain, Limelight limelight) {
 		this.drivetrain = drivetrain;
@@ -42,6 +42,8 @@ public class AutoAlign extends CommandBase {
 		} else {
 			YOutput = 0d;
 		}
+
+		// ROutput = RController.calculate(limelight.getHorizontalOffset())
 
 		drivetrain.drive(ChassisSpeeds.fromFieldRelativeSpeeds(drivetrain.percentOutputToMetersPerSecond(0d), 
         drivetrain.percentOutputToMetersPerSecond(YOutput),

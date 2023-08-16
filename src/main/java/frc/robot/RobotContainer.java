@@ -15,6 +15,7 @@ import frc.robot.commands.AutoAlign;
 import frc.robot.commands.AutoBalance;
 import frc.robot.commands.Collect;
 import frc.robot.commands.SwerveDrive;
+import frc.robot.commands.ZeroWrist;
 import frc.robot.commands.Tests.Collector.CollectorSystemTest;
 import frc.robot.commands.Tests.Drive.DriveTrainSystemTest;
 import frc.robot.commands.HoldPower;
@@ -85,10 +86,12 @@ public class RobotContainer extends LightningContainer {
         new Trigger (copilot::getXButton).whileTrue(new Score(collector, wrist, () -> wristStates.MidCube));
         new Trigger (copilot::getYButton).whileTrue(new Score(collector, wrist, () -> wristStates.HighCube));
 
-        new Trigger(copilot::getRightBumper).whileTrue(new InstantCommand(() -> collector.setPercentPower(copilot.getRightTriggerAxis()))).onFalse(new InstantCommand(() -> collector.setPercentPower(0d)));
+        // new Trigger(copilot::getRightBumper).whileTrue(new InstantCommand(() -> collector.setPercentPower(copilot.getRightTriggerAxis()))).onFalse(new InstantCommand(() -> collector.setPercentPower(0d)));
+
+        new Trigger(copilot::getRightBumper).whileTrue(new ZeroWrist(wrist));
 
         //FLICK TODO FIX
-        new Trigger(() -> -copilot.getLeftY() < -0.25).onTrue(new InstantCommand(() -> wrist.setGoalState(wristStates.Ground)));
+        // new Trigger(() -> -copilot.getLeftY() < -0.25).onTrue(new InstantCommand(() -> wrist.setGoalState(wristStates.Ground)));
 
         // DISABLE LIFT
         new Trigger(() -> copilot.getStartButton() && copilot.getBackButton()).onTrue(new InstantCommand(wrist::disableWrist));
@@ -145,6 +148,8 @@ public class RobotContainer extends LightningContainer {
         collector.setDefaultCommand(new HoldPower(collector, () -> MathUtil.applyDeadband(copilot.getRightTriggerAxis(),
                 ControllerConstants.DEADBAND) - MathUtil.applyDeadband(copilot.getLeftTriggerAxis(),
                 ControllerConstants.DEADBAND), driver, copilot, wrist));
+
+        wrist.setDefaultCommand(new ZeroWrist(wrist)); //TOOD: test```
 
         // collector.setDefaultCommand(new Collect(collector, () ->
         // MathUtil.applyDeadband(copilot.getRightTriggerAxis(), ControllerConstants.DEADBAND) -
