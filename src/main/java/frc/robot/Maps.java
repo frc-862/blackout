@@ -8,10 +8,10 @@ import frc.robot.Constants.CollectorConstants;
 import frc.robot.Constants.WristAngles.wristStates;
 import frc.robot.commands.AutoBalance;
 import frc.robot.commands.Collect;
-import frc.robot.commands.Shoot;
+import frc.robot.commands.Score;
 import frc.robot.subsystems.Collector;
 import frc.robot.subsystems.Drivetrain;
-import frc.robot.subsystems.LimelightFront;
+import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.Wrist;
 import frc.thunder.vision.VisionBase;
 
@@ -29,9 +29,9 @@ public class Maps {
      * @param wrist
      * @return 
      */
-    public static HashMap<String, Command> getPathMap(Drivetrain drivetrain, Collector collector, LimelightFront frontLimelight, Wrist wrist){
+    public static HashMap<String, Command> getPathMap(Drivetrain drivetrain, Collector collector, Limelight frontLimelight, Wrist wrist){
         HashMap<String, Command> eventMap = new HashMap<>();
-        // SET Positions 
+        // SET Positions TODO Change to Score command?
         eventMap.put("Ground-Collect", new InstantCommand(() -> wrist.setGoalState(wristStates.Ground)));
         eventMap.put("Mid-Score", new InstantCommand(() -> wrist.setGoalState(wristStates.MidCube)));
         eventMap.put("High-Score", new InstantCommand(() -> wrist.setGoalState(wristStates.HighCube)));
@@ -45,7 +45,7 @@ public class Maps {
         
         eventMap.put("Score", new InstantCommand(() -> collector.setPercentPower(-1d))); // Full power Score to spit out cube
         eventMap.put("Score-Slow", new InstantCommand(() -> collector.setPercentPower(-.50))); // Lower power for no roll out
-        eventMap.put("Score-Smart", new Shoot(collector, wrist));
+        // eventMap.put("Score-Smart", new Score(collector, wrist));
         // OTHER
         eventMap.put("Auto-Balance", new AutoBalance(drivetrain)); // Call to AutoBalance command requires drivetrain, must be at the end of the path
         

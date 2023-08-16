@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.AutoAlignConstants;
+import frc.robot.Constants.AutoScoreConstants;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.Constants.DrivetrainConstants.Offsets;
 import frc.robot.Constants.RobotMap;
@@ -124,7 +125,7 @@ public class Drivetrain extends SubsystemBase {
     private ChassisSpeeds outputChassisSpeeds = new ChassisSpeeds();
 
     //private LimelightBack limelightBack;
-    private LimelightFront limelightFront;
+    private Limelight limelightFront;
 
     private boolean hasLimitChanged = false;
 
@@ -146,7 +147,7 @@ public class Drivetrain extends SubsystemBase {
      * @param limelightBack  The back Limelight
      * @param limelightFront The front Limelight
      */
-    public Drivetrain(LimelightFront limelightFront) {
+    public Drivetrain(Limelight limelightFront) {
         // this.limelightBack = limelightBack;
         this.limelightFront = limelightFront;
 
@@ -523,7 +524,7 @@ public class Drivetrain extends SubsystemBase {
      * Gets the current pathplanner path point of the robot in meters using
      */
     public PathPoint getCurrentPathPoint() {
-        return PathPoint.fromCurrentHolonomicState(pose, chassisSpeeds).withControlLengths(AutoAlignConstants.CONTROL_LENGTHS, AutoAlignConstants.CONTROL_LENGTHS);
+        return PathPoint.fromCurrentHolonomicState(pose, chassisSpeeds).withControlLengths(AutoScoreConstants.CONTROL_LENGTHS, AutoScoreConstants.CONTROL_LENGTHS);
     }
 
     // Testing for auton
@@ -795,8 +796,8 @@ public class Drivetrain extends SubsystemBase {
 
         Rotation2d driveHeading = getDriveHeading(desiredPose.getX(), desiredPose.getY());
 
-        autoFactory.createManualTrajectory(new PathConstraints(maxVel, maxAccell), getCurrentPathPoint(),
-                new PathPoint(desiredPose.getTranslation(), driveHeading, desiredPose.getRotation()).withControlLengths(AutoAlignConstants.CONTROL_LENGTHS, AutoAlignConstants.CONTROL_LENGTHS));
+        // autoFactory.createManualTrajectory(new PathConstraints(maxVel, maxAccell), getCurrentPathPoint(),
+        //         new PathPoint(desiredPose.getTranslation(), driveHeading, desiredPose.getRotation()).withControlLengths(AutoAlignConstants.CONTROL_LENGTHS, AutoAlignConstants.CONTROL_LENGTHS));
 
     }
 

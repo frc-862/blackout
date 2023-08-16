@@ -141,7 +141,9 @@ public class Collector extends SubsystemBase {
         RPMController.setD(LightningShuffleboard.getDouble("Collector", "kD", CollectorConstants.MOTOR_kD));
     
 
+        LightningShuffleboard.setDouble("Collector", "Collector Amps", motor.getAppliedOutput());
         LightningShuffleboard.setDouble("Collector", "RPM", getCurrentRPM());
+        // LightningShuffleboard.setDouble("Colletor", "",motor. );
 
         setRPM(LightningShuffleboard.getDouble("Collector", "Set RPM", 0));
     }

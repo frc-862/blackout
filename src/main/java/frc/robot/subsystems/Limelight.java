@@ -16,7 +16,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 
-public class LimelightFront extends SubsystemBase {
+public class Limelight extends SubsystemBase {
 
     // Change "limelight" to whatever the name of the limelight you are using
     // we should rename the limelight names to something consistent later
@@ -31,7 +31,7 @@ public class LimelightFront extends SubsystemBase {
     // position of the limelight relative to the center and bottom of the robot
     private Pose3d cameraPose;
 
-    public LimelightFront(String limelightName, Pose3d cameraPose) {
+    public Limelight(String limelightName, Pose3d cameraPose) {
         this.limelightName = limelightName;
         this.cameraPose = cameraPose;
 

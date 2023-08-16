@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkMaxLimitSwitch;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,8 +22,8 @@ public class Wrist extends SubsystemBase {
     
     private CANSparkMax motor;
 
-    wristStates currState;
-    wristStates goalState;
+    wristStates currState = wristStates.Stow;
+    wristStates goalState = wristStates.Stow;
 
     private PIDController upController = new PIDController(WristConstants.UP_kP, WristConstants.UP_kI, WristConstants.UP_kD);
     private PIDController downController = new PIDController(WristConstants.DOWN_kP, WristConstants.DOWN_kI, WristConstants.DOWN_kD);
@@ -31,7 +32,6 @@ public class Wrist extends SubsystemBase {
 
     private double FOutput = 0d;
     private double PIDOutput = 0d;
-    private double currentAngle;
     private double targetAngle;
 
     private double OFFSET = 0d;
@@ -42,6 +42,10 @@ public class Wrist extends SubsystemBase {
 
         // Channel 0 is up
         // Channel 1 is down
+
+
+        setTargetAngle(WristAngles.angleMap().get(goalState));
+
 
         CommandScheduler.getInstance().registerSubsystem(this);
     }
@@ -63,11 +67,7 @@ public class Wrist extends SubsystemBase {
      * @return Rotation2d of the wrist from encoder
      */
     public Rotation2d getAngle() { //TODO FIX CONVERSION factor
-        return Rotation2d.fromDegrees(MathUtil.inputModulus(motor.getEncoder().getPosition() * WristConstants.POSITION_CONVERSION_FACTOR - OFFSET, -180, 180));
-    }
-
-    public void setOffset() {
-        OFFSET = motor.getEncoder().getPosition() * WristConstants.POSITION_CONVERSION_FACTOR + WristConstants.MIN_ANGLE;
+        return Rotation2d.fromDegrees(motor.getEncoder().getPosition() * WristConstants.POSITION_CONVERSION_FACTOR + OFFSET);
     }
     
     public void disableWrist() {
@@ -100,58 +100,63 @@ public class Wrist extends SubsystemBase {
     }
 
     public boolean onTarget() {
-        return (getAngle().getDegrees() - targetAngle) < WristConstants.WRIST_TOLERANCE;
+        return Math.abs(getAngle().getDegrees() - targetAngle) < WristConstants.WRIST_TOLERANCE;
     }
 
     public void adjustWrist(double bias) {
         setTargetAngle(getAngle().getDegrees() + bias);
     }
 
-    public void zero() {
-        if(!isStalling()){
-            motor.set(WristConstants.ZERO_SPEED);
-        } else {
-            stop();
-            setOffset();
-        }
-    }
-
     public boolean isStalling(){
         return motor.getOutputCurrent() >= WristConstants.STALL_CURRENT;
+    }
+
+    public boolean isMoving() {
+        return Math.abs(motor.getEncoder().getVelocity()) >= WristConstants.IS_MOVING_THRESHHOLD;
+        
     }
 
     public void periodic() {
         if (currState != goalState) {
             setTargetAngle(WristAngles.angleMap().get(goalState));
-            currState = goalState;
+            if(onTarget()) {
+                currState = goalState;
+            }
         }
         
 
-        upController.setP(LightningShuffleboard.getDouble("Collector", "UP_kP", WristConstants.UP_kP));
-        upController.setI(LightningShuffleboard.getDouble("Collector", "UP_kI", WristConstants.UP_kI));
-        upController.setD(LightningShuffleboard.getDouble("Collector", "UP_kD", WristConstants.UP_kD));
+        upController.setP(LightningShuffleboard.getDouble("Wrist", "UP_kP", WristConstants.UP_kP));
+        upController.setI(LightningShuffleboard.getDouble("Wrist", "UP_kI", WristConstants.UP_kI));
+        upController.setD(LightningShuffleboard.getDouble("Wrist", "UP_kD", WristConstants.UP_kD));
 
-        downController.setP(LightningShuffleboard.getDouble("Collector", "DOWN_kP", WristConstants.DOWN_kP));
-        downController.setI(LightningShuffleboard.getDouble("Collector", "DOWN_kI", WristConstants.DOWN_kI));
-        downController.setD(LightningShuffleboard.getDouble("Collector", "DOWN_kD", WristConstants.DOWN_kD));
-
-        targetAngle = (LightningShuffleboard.getDouble("Collector", "Target Angle", 0));
-
+        // targetAngle = (LightningShuffleboard.getDouble("Wrist", "Target Angle", 0));
+        LightningShuffleboard.setDouble("Wrist", "Current Angle", getAngle().getDegrees());
+        LightningShuffleboard.setString("Wrist", "Goal State", getGoalState().toString());
+        LightningShuffleboard.setString("Wrist", "Current State", getCurrState().toString());
+        LightningShuffleboard.setDouble("Wrist", "Target Angle", WristAngles.angleMap().get(goalState));
         
 
+
+        // if (targetAngle - currentAngle > 0) {
+            PIDOutput = upController.calculate(getAngle().getDegrees(), targetAngle);
+        // } else {
+        //     PIDOutput = downController.calculate(currentAngle, targetAngle);
+        // }
         
-        if (targetAngle - currentAngle > 0) {
-            PIDOutput = upController.calculate(currentAngle, targetAngle);
-        } else {
-            PIDOutput = downController.calculate(currentAngle, targetAngle);
-        }
-        
-        FOutput = WristConstants.WRIST_KF_MAP.get(getAngle().getDegrees());
+        // FOutput = WristConstants.WRIST_KF_MAP.get(getAngle().getDegrees());
+
+        LightningShuffleboard.setDouble("Wrist", "Power Output", PIDOutput);
+
 
         if(!disableWrist){
-            motor.set(FOutput + PIDOutput);
+            setPower(PIDOutput);
         } else {
             stop();
+        }
+
+        if (motor.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen).isPressed()) {
+            OFFSET = 0;
+            OFFSET = WristConstants.MAX_ANGLE - getAngle().getDegrees();
         }
     }
 }   

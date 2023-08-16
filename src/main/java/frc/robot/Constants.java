@@ -154,12 +154,24 @@ public final class Constants {
 
     public static final class LimelightConstants {
         public static final String FRONT_NAME = "limelight-front";
-        public static final Pose3d FRONT_POSE = new Pose3d(.1, 0.28, 0.72, new Rotation3d(0, 0, 0)); // Position
-                                                                                                     // on
-                                                                                                     // robot
+        public static final Pose3d FRONT_POSE = new Pose3d(.1, 0.28, 0.72, new Rotation3d(0, 0, 0)); // Position on robot
         public static final double CUBE_OFFSET = 0.0; // TODO find this value
     }
 
+    public static final class AutoAlignConstants { 
+        public static final double RkP = 0.01d;
+        public static final double RkI = 0.00d;
+        public static final double RkD = 0.01d;
+        
+        public static final double YkP = -0.05d;
+        public static final double YkI = 0.00d;
+        public static final double YkD = -0.03d;
+
+        public static final double TARGET_ANGLE = 180d;
+
+        public static final double TOLERANCE = 1d;
+
+    }
 
     public static final class CollectorConstants {
         public static final boolean MOTOR_INVERT = false;
@@ -169,7 +181,7 @@ public final class Constants {
         public static final double HOLD_POWER_CUBE = 0.25;
         public static final double HOLD_POWER_CONE = 0.65;
         public static final MotorType MOTOR_TYPE = MotorType.kBrushless;
-        public static final IdleMode IDLE_MODE = IdleMode.kCoast;
+        public static final IdleMode IDLE_MODE = IdleMode.kBrake;
 
         public static final double STALL_POWER = 35d; // Used to detect wether or not the collector
                                                       // is stalling meaning it has a game piece
@@ -187,23 +199,24 @@ public final class Constants {
     public static final class WristConstants {
 
         // Motor configuration constants
-        public static final boolean MOTOR_INVERT = true; // TODO Check
+        public static final boolean MOTOR_INVERT = false;
 
         public static final int CURRENT_LIMIT = 40;
         public static final int STALL_CURRENT = 30; // TODO GET AT zeroing speed
+        public static final double IS_MOVING_THRESHHOLD = 0.05d; // TODO TEST
 
-        public static final IdleMode IDLE_MODE = IdleMode.kBrake;
+        public static final IdleMode IDLE_MODE = IdleMode.kCoast;
         public static final MotorType MOTOR_TYPE = MotorType.kBrushless;
 
         public static final double WRIST_TOLERANCE = 4d;
 
         // PID gains for our wrist going up and down
-        public static final double UP_kP = 0.0079d;
+        public static final double UP_kP = 0.02d;
         public static final double UP_kI = 0.0d;
-        public static final double UP_kD = 0.0001d;
+        public static final double UP_kD = 0.000d;
 
 
-        public static final double DOWN_kP = 0.006d;
+        public static final double DOWN_kP = 0.00d;
         public static final double DOWN_kI = 0d;
         public static final double DOWN_kD = 0d;
 
@@ -211,12 +224,12 @@ public final class Constants {
         public static final double TOLERANCE = 12d;
 
         // Min/max angles in degrees
-        public static final double MAX_ANGLE = 151d; // TODO reget
-        public static final double MIN_ANGLE = -100d;
+        public static final double MAX_ANGLE = 121d; 
+        public static final double MIN_ANGLE = 0;
 
         // Min and Max power
         public static final double MIN_POWER = -1d; // TODO implement and check
-        public static final double MAX_POWER = 0.9d;
+        public static final double MAX_POWER = 1d;
 
         public static final double LOG_PERIOD = 0.24;
 
@@ -227,18 +240,19 @@ public final class Constants {
         public static final double ZERO_SPEED = 0.1d; // TODO test
 
         // Conversion factor for our wrist, multiply this by the navite units to get degrees
-        public static final double POSITION_CONVERSION_FACTOR = 360; // TODO check
+        public static final double POSITION_CONVERSION_FACTOR = 2; // TODO check
 
         // Interpolation map for our arm Feedforward values to make sure we have enough minimum
         // power to move the arm
         public static InterpolationMap WRIST_KF_MAP = new InterpolationMap() {
             {
-                put(-90d, 0d);
-                put(-45d, -0.008d);
-                put(0d, 0.017d);
-                put(45d, 0.01d);
-                put(90d, 0d);
-                put(135d, 0.008d);
+                // put(-90d, 0d);
+                // put(-45d, -0.008d);
+                // put(0d, 0.017d);
+                // put(45d, 0.01d);
+                // put(90d, 0d);
+                // put(135d, 0.008d);
+                put(0d, 0d);
             }
         };
     }
@@ -271,11 +285,10 @@ public final class Constants {
             public static final int BACK_LEFT_CANCODER = 34;
 
             // COLLECTOR
-            public static final int COLLECTOR_MOTOR = 9; // TODO get Real
+            public static final int COLLECTOR_MOTOR = 10; 
             // WRIST
-            public static final int WRIST_MOTOR = 10; // TODO get Real
+            public static final int WRIST_MOTOR = 9;
         
-
             // CANdle
             public static final int CANDLE = 22;
         }
@@ -370,7 +383,7 @@ public final class Constants {
     }
 
     // Constants for autoAlign
-    public static final class AutoAlignConstants {
+    public static final class AutoScoreConstants {
 
         public static final class BluePoints {
             public static final Pose2d SLOT_1_POSE =
@@ -444,18 +457,18 @@ public final class Constants {
         public static final HashMap<wristStates, Double> angleMap() { // TODO Get Angles
             HashMap<wristStates, Double> angleMap = new HashMap<>();
             angleMap.put(wristStates.Ground, 0d);
-            angleMap.put(wristStates.Stow, 0d);
-            angleMap.put(wristStates.MidCube, 0d);
-            angleMap.put(wristStates.HighCube, 0d);
+            angleMap.put(wristStates.Stow, 120d);
+            angleMap.put(wristStates.MidCube, 30d);
+            angleMap.put(wristStates.HighCube, 115d);
             return angleMap;
         }
 
-        public static final HashMap<wristStates, Integer> shootSpeedMap() { // TODO Get Speeds
-            HashMap<wristStates, Integer> shootSpeedMap = new HashMap<>();
-            shootSpeedMap.put(wristStates.Stow, -99999);
-            shootSpeedMap.put(wristStates.Ground, 0);
-            shootSpeedMap.put(wristStates.MidCube, 0);
-            shootSpeedMap.put(wristStates.HighCube, 0);
+        public static final HashMap<wristStates, Double> shootSpeedMap() { // TODO Get Speeds
+            HashMap<wristStates, Double> shootSpeedMap = new HashMap<>();
+            shootSpeedMap.put(wristStates.Stow, -99999d);
+            shootSpeedMap.put(wristStates.Ground, 100d);
+            shootSpeedMap.put(wristStates.MidCube, 1000d);
+            shootSpeedMap.put(wristStates.HighCube, 3000d);
             return shootSpeedMap;
         }
 
