@@ -78,11 +78,14 @@ public class HoldPower extends CommandBase {
 
             collector.setPercentPower(power);
         }
+
+        
     }
 
     @Override
     public void end(boolean interrupted) {
         collector.stop();
+        doHoldPower = false;
     }
 
     @Override

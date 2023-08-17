@@ -3,6 +3,7 @@ package frc.robot;
 import frc.robot.subsystems.Collector;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.Limelight;
@@ -15,7 +16,7 @@ import frc.robot.commands.AutoAlign;
 import frc.robot.commands.AutoBalance;
 import frc.robot.commands.Collect;
 import frc.robot.commands.SwerveDrive;
-import frc.robot.commands.ZeroWrist;
+import frc.robot.commands.ZeroRizz;
 import frc.robot.commands.Tests.Collector.CollectorSystemTest;
 import frc.robot.commands.Tests.Drive.DriveTrainSystemTest;
 import frc.robot.commands.HoldPower;
@@ -52,6 +53,9 @@ public class RobotContainer extends LightningContainer {
 
     @Override
     protected void configureButtonBindings() {
+
+        new Trigger(DriverStation::isTeleopEnabled).onTrue(new ZeroRizz(wrist));
+
         /* driver Controls */
         // RESETS
         new Trigger(() -> (driver.getBackButton() && driver.getStartButton())).onTrue(new InstantCommand(drivetrain::zeroHeading, drivetrain)); // Resets Forward to be the direction the robot is facing
@@ -88,7 +92,7 @@ public class RobotContainer extends LightningContainer {
 
         // new Trigger(copilot::getRightBumper).whileTrue(new InstantCommand(() -> collector.setPercentPower(copilot.getRightTriggerAxis()))).onFalse(new InstantCommand(() -> collector.setPercentPower(0d)));
 
-        new Trigger(copilot::getRightBumper).whileTrue(new ZeroWrist(wrist));
+        new Trigger(copilot::getRightBumper).whileTrue(new ZeroRizz(wrist));
 
         //FLICK TODO FIX
         // new Trigger(() -> -copilot.getLeftY() < -0.25).onTrue(new InstantCommand(() -> wrist.setGoalState(wristStates.Ground)));
@@ -149,7 +153,7 @@ public class RobotContainer extends LightningContainer {
                 ControllerConstants.DEADBAND) - MathUtil.applyDeadband(copilot.getLeftTriggerAxis(),
                 ControllerConstants.DEADBAND), driver, copilot, wrist));
 
-        wrist.setDefaultCommand(new ZeroWrist(wrist)); //TOOD: test```
+        // wrist.setDefaultCommand(new ZeroWrist(wrist)); //TOOD: test```
 
         // collector.setDefaultCommand(new Collect(collector, () ->
         // MathUtil.applyDeadband(copilot.getRightTriggerAxis(), ControllerConstants.DEADBAND) -

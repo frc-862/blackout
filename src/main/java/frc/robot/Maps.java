@@ -41,7 +41,7 @@ public class Maps {
         eventMap.put("Collect", new InstantCommand(() -> collector.setPercentPower(1d), collector)); // Starts the collector intake
         eventMap.put("Stop-Collector", new InstantCommand(() -> collector.stop(), collector)); // Stops the collector
         
-        eventMap.put("Hold-Power", new InstantCommand(() -> collector.setPercentPower(CollectorConstants.HOLD_POWER_CUBE))); // Power to hold cube once piece is collected
+        eventMap.put("Hold-Power", new InstantCommand(() -> collector.setPercentPower(CollectorConstants.HOLD_POWER))); // Power to hold cube once piece is collected
         
         eventMap.put("Score", new InstantCommand(() -> collector.setPercentPower(-1d))); // Full power Score to spit out cube
         eventMap.put("Score-Slow", new InstantCommand(() -> collector.setPercentPower(-.50))); // Lower power for no roll out
@@ -59,3 +59,4 @@ public class Maps {
         return eventMap;
     }
 }
+ 

@@ -144,10 +144,10 @@ public final class Constants {
 
             // Blackouts swerve module absolute encoder offsets
             public static final class Blackout { // TODO Need offsets
-                public static final double FRONT_LEFT_STEER_OFFSET = -Math.toRadians(253.916);
-                public static final double FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(222.451);
-                public static final double BACK_LEFT_STEER_OFFSET = -Math.toRadians(19.688);
-                public static final double BACK_RIGHT_STEER_OFFSET = -Math.toRadians(63.018);
+                public static final double FRONT_LEFT_STEER_OFFSET = -Math.toRadians(180.705);   //253.916);
+                public static final double FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(331.507);   //222.451);
+                public static final double BACK_LEFT_STEER_OFFSET = -Math.toRadians(222.940);   //19.688);
+                public static final double BACK_RIGHT_STEER_OFFSET = -Math.toRadians(211.396);   //63.018);
             }
         }
     }
@@ -176,7 +176,7 @@ public final class Constants {
     }
 
     public static final class CollectorConstants {
-        public static final boolean MOTOR_INVERT = false;
+        public static final boolean MOTOR_INVERT = true;
 
         public static final int CURRENT_LIMIT = 0; // :P
 
@@ -207,6 +207,7 @@ public final class Constants {
 
         // Motor configuration constants
         public static final boolean MOTOR_INVERT = false;
+        public static final boolean ENCODER_INVERT = false;
 
         public static final int CURRENT_LIMIT = 40;
         public static final int STALL_CURRENT = 30; // TODO GET AT zeroing speed
@@ -218,12 +219,12 @@ public final class Constants {
         public static final double WRIST_TOLERANCE = 4d;
 
         // PID gains for our wrist going up and down
-        public static final double UP_kP = 0.02d;
+        public static final double UP_kP = 0.07d;
         public static final double UP_kI = 0.0d;
         public static final double UP_kD = 0.000d;
 
 
-        public static final double DOWN_kP = 0.00d;
+        public static final double DOWN_kP = 0.07d;
         public static final double DOWN_kI = 0d;
         public static final double DOWN_kD = 0d;
 
@@ -231,7 +232,7 @@ public final class Constants {
         public static final double TOLERANCE = 12d;
 
         // Min/max angles in degrees
-        public static final double MAX_ANGLE = 121d;
+        public static final double MAX_ANGLE = 126d;
         public static final double MIN_ANGLE = 0;
 
         // Min and Max power
@@ -247,7 +248,7 @@ public final class Constants {
         public static final double ZERO_SPEED = 0.1d; // TODO test
 
         // Conversion factor for our wrist, multiply this by the navite units to get degrees
-        public static final double POSITION_CONVERSION_FACTOR = 2; // TODO check
+        public static final double POSITION_CONVERSION_FACTOR = 360/160; // TODO check
 
         // Interpolation map for our arm Feedforward values to make sure we have enough minimum
         // power to move the arm
@@ -479,9 +480,9 @@ public final class Constants {
         public static final HashMap<wristStates, Double> shootMap() { // TODO Get Speeds
             HashMap<wristStates, Double> shootMap = new HashMap<>();
             shootMap.put(wristStates.Stow, CollectorConstants.HOLD_POWER);
-            shootMap.put(wristStates.Ground, 0.25);
-            shootMap.put(wristStates.MidCube, 0.75);
-            shootMap.put(wristStates.HighCube, 1.0);
+            shootMap.put(wristStates.Ground, -0.25);
+            shootMap.put(wristStates.MidCube, -0.75);
+            shootMap.put(wristStates.HighCube, -1.0);
             return shootMap;
         }
 

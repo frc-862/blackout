@@ -38,7 +38,7 @@ public class Score extends CommandBase {
 			// targetRPM = WristAngles.shootSpeedMap().get(wrist.getCurrState());
 			// collector.setRPM(targetRPM);
 
-			collector.setPercentPower(targetPower);
+			collector.setPercentPower(WristAngles.shootMap().get(wrist.getCurrState()));
 		}
 	}
 

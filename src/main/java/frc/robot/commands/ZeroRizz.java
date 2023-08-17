@@ -4,10 +4,10 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.WristConstants;
 import frc.robot.subsystems.Wrist;
 
-public class ZeroWrist extends CommandBase {
+public class ZeroRizz extends CommandBase {
     Wrist wrist;
 
-    public ZeroWrist(Wrist wrist) {
+    public ZeroRizz(Wrist wrist) {
         this.wrist = wrist;
 
         addRequirements(wrist);
@@ -16,7 +16,7 @@ public class ZeroWrist extends CommandBase {
     @Override
     public void initialize() {
         wrist.disableWrist();
-        wrist.setPower(0.1);
+        wrist.setPower(WristConstants.ZERO_SPEED);
     }
 
     @Override
