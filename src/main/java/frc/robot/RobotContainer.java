@@ -1,63 +1,209 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.Autos;
-import frc.robot.commands.ExampleCommand;
-import frc.robot.subsystems.ExampleSubsystem;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.Collector;
+
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.subsystems.Limelight;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import frc.robot.subsystems.Wrist;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.AutonomousConstants;
+import frc.robot.Constants.ControllerConstants;
+import frc.robot.commands.AutoAlign;
+import frc.robot.commands.AutoBalance;
+import frc.robot.commands.Collect;
+import frc.robot.commands.SwerveDrive;
+import frc.robot.commands.ZeroRizz;
+import frc.robot.commands.Tests.Collector.CollectorSystemTest;
+import frc.robot.commands.Tests.Drive.DriveTrainSystemTest;
+import frc.robot.commands.HoldPower;
+import frc.robot.commands.Score;
+import frc.robot.subsystems.Drivetrain;
+import frc.thunder.LightningContainer;
+import frc.robot.Constants.LimelightConstants;
+import frc.robot.Constants.WristAngles.wristStates;
+import frc.thunder.auto.Autonomous;
+import frc.thunder.auto.AutonomousCommandFactory;
+import frc.thunder.pathplanner.com.pathplanner.lib.PathConstraints;
+import frc.thunder.testing.SystemTest;
 
-/**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
- * subsystems, commands, and trigger mappings) should be declared here.
- */
-public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+public class RobotContainer extends LightningContainer {
 
-  // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController =
-      new CommandXboxController(OperatorConstants.kDriverControllerPort);
+    private static final Limelight limelight =
+            new Limelight(LimelightConstants.FRONT_NAME, LimelightConstants.FRONT_POSE);
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  public RobotContainer() {
-    // Configure the trigger bindings
-    configureBindings();
-  }
+    // Creating our main subsystems
+    private static final Drivetrain drivetrain = new Drivetrain(limelight);
+    private static final Wrist wrist = new Wrist();
+    private static final Collector collector = new Collector();
 
-  /**
-   * Use this method to define your trigger->command mappings. Triggers can be created via the
-   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
-   * predicate, or via the named factories in {@link
-   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
-   * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-   * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-   * joysticks}.
-   */
-  private void configureBindings() {
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    new Trigger(m_exampleSubsystem::exampleCondition)
-        .onTrue(new ExampleCommand(m_exampleSubsystem));
+    // Creates our controllers and deadzones
+    private static final XboxController driver =
+            new XboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
+    private static final XboxController copilot =
+            new XboxController(ControllerConstants.COPILOT_CONTROLLER_PORT);
 
-    // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
-    // cancelling on release.
-    m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
-  }
+    // creates Autonomous Command
+    private static final AutonomousCommandFactory autoFactory =
+            new AutonomousCommandFactory(drivetrain::getPose, drivetrain::resetOdometry,drivetrain.getDriveKinematics(), AutonomousConstants.DRIVE_PID_CONSTANTS,
+                    AutonomousConstants.THETA_PID_CONSTANTS, AutonomousConstants.POSE_PID_CONSTANTS, drivetrain::setStates, drivetrain::resetNeoAngle, drivetrain);
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
-    return Autos.exampleAuto(m_exampleSubsystem);
-  }
+    @Override
+    protected void configureButtonBindings() {
+
+        new Trigger(DriverStation::isTeleopEnabled).onTrue(new ZeroRizz(wrist));
+
+        /* driver Controls */
+        // RESETS
+        new Trigger(() -> (driver.getBackButton() && driver.getStartButton())).onTrue(new InstantCommand(drivetrain::zeroHeading, drivetrain)); // Resets Forward to be the direction the robot is facing
+
+        new Trigger(driver::getAButton).onTrue(new InstantCommand(drivetrain::resetNeoAngle)); // REsyncs the NEOs relative encoder to the absolute encoders on the swerve modules
+
+        // Flips modules 180 degrees to fix a module that is facing the wrong way on startup
+        new Trigger(() -> driver.getPOV() == 0).onTrue(new InstantCommand(drivetrain::flipFR, drivetrain));
+        new Trigger(() -> driver.getPOV() == 180).onTrue(new InstantCommand(drivetrain::flipBL, drivetrain));
+        new Trigger(() -> driver.getPOV() == 90).onTrue(new InstantCommand(drivetrain::flipBR, drivetrain));
+        new Trigger(() -> driver.getPOV() == 270).onTrue(new InstantCommand(drivetrain::flipFL, drivetrain));
+
+        // SET DRIVE PODS TO 45
+        new Trigger(driver::getXButton).whileTrue(new RunCommand(() -> drivetrain.stop(), drivetrain)); // Locks wheels to prevent sliding especially once balanced
+        
+        //AUTOBALANCE
+        // new Trigger(driver::getBButton).whileTrue(new AutoBalance(drivetrain)); // FOR TESTING
+        
+        //LINE UP
+        new Trigger(driver::getBButton).whileTrue(new AutoAlign(drivetrain, limelight));
+
+        // AUTO deploy on collect TODO test
+        // Retract on stoping collect TODO test
+
+        // Auto shoot when button
+
+        /* copilot controls */
+        
+        //SETPOINTS
+        new Trigger (copilot::getAButton).whileTrue(new Score(collector, wrist, () -> wristStates.Ground));
+        new Trigger(copilot::getBButton).onTrue(new InstantCommand(() -> wrist.setGoalState(wristStates.Stow), wrist)); 
+        new Trigger (copilot::getXButton).whileTrue(new Score(collector, wrist, () -> wristStates.MidCube));
+        new Trigger (copilot::getYButton).whileTrue(new Score(collector, wrist, () -> wristStates.HighCube));
+
+        // new Trigger(copilot::getRightBumper).whileTrue(new InstantCommand(() -> collector.setPercentPower(copilot.getRightTriggerAxis()))).onFalse(new InstantCommand(() -> collector.setPercentPower(0d)));
+
+        new Trigger(copilot::getRightBumper).whileTrue(new ZeroRizz(wrist));
+
+        //FLICK TODO FIX
+        // new Trigger(() -> -copilot.getLeftY() < -0.25).onTrue(new InstantCommand(() -> wrist.setGoalState(wristStates.Ground)));
+
+        // DISABLE LIFT
+        new Trigger(() -> copilot.getStartButton() && copilot.getBackButton()).onTrue(new InstantCommand(wrist::disableWrist));
+
+        //BIAS
+        new Trigger(() -> copilot.getPOV() == 0).onTrue(new InstantCommand(() -> wrist.adjustWrist(10d)));
+        new Trigger(() -> copilot.getPOV() == 180).onTrue(new InstantCommand(() -> wrist.adjustWrist(-10d)));
+    }
+
+    // Creates the autonomous commands
+    @Override
+    protected void configureAutonomousCommands() {
+        // EXAMPLE
+        // autoFactory.makeTrajectory("NAME", Maps.getPathMap(drivetrain, servoturn, lift, collector, leds, arm), 
+        // new PathConstraints(AutonomousConstants.MAX_VELOCITY, AutonomousConstants.MAX_ACCELERATION));
+
+        // A PATHS 
+        autoFactory.makeTrajectory("A2[3]-M-BACK", Maps.getPathMap(drivetrain, collector, limelight, wrist), 
+                new PathConstraints(AutonomousConstants.MAX_VELOCITY, AutonomousConstants.MAX_ACCELERATION));
+
+        // B PATHS
+        autoFactory.makeTrajectory("B2[1]-C-LOW", Maps.getPathMap(drivetrain, collector, limelight, wrist), 
+                new PathConstraints(AutonomousConstants.MAX_VELOCITY, AutonomousConstants.MAX_ACCELERATION));
+        autoFactory.makeTrajectory("B2[1]-M-C-LOW", Maps.getPathMap(drivetrain, collector, limelight, wrist), 
+                new PathConstraints(AutonomousConstants.MAX_VELOCITY, AutonomousConstants.MAX_ACCELERATION));
+        autoFactory.makeTrajectory("B2[1]-M-C-HIGH", Maps.getPathMap(drivetrain, collector, limelight, wrist), 
+                new PathConstraints(AutonomousConstants.MAX_VELOCITY, AutonomousConstants.MAX_ACCELERATION));
+
+        // C PATHS
+        autoFactory.makeTrajectory("C2[2]-M-M-H", Maps.getPathMap(drivetrain, collector, limelight, wrist), 
+                new PathConstraints(AutonomousConstants.MAX_VELOCITY, AutonomousConstants.MAX_ACCELERATION));
+
+        
+        // ANYWHERE
+        Autonomous.register("ruh roh flick auto", new InstantCommand()); // Emergency Auton that doesn't drive
+    }
+
+    @Override
+    protected void configureDefaultCommands() {
+
+        /*
+         * Set up the default command for the drivetrain. The controls are for field-oriented
+         * driving: Left stick Y axis -> forward and backwards movement Left stick X axis -> left
+         * and right movement Right stick X axis -> rotation
+         */
+        drivetrain.setDefaultCommand(new SwerveDrive(drivetrain,
+                () -> MathUtil.applyDeadband(driver.getLeftX(), ControllerConstants.DEADBAND),
+                () -> MathUtil.applyDeadband(driver.getLeftY(), ControllerConstants.DEADBAND),
+                () -> MathUtil.applyDeadband(-driver.getRightX(), ControllerConstants.DEADBAND),
+                () -> driver.getRightTriggerAxis() > 0.25,
+                () -> driver.getLeftTriggerAxis() > 0.25));
+
+
+        collector.setDefaultCommand(new HoldPower(collector, () -> MathUtil.applyDeadband(copilot.getRightTriggerAxis(),
+                ControllerConstants.DEADBAND) - MathUtil.applyDeadband(copilot.getLeftTriggerAxis(),
+                ControllerConstants.DEADBAND), driver, copilot, wrist));
+
+        // wrist.setDefaultCommand(new ZeroWrist(wrist)); //TOOD: test```
+
+        // collector.setDefaultCommand(new Collect(collector, () ->
+        // MathUtil.applyDeadband(copilot.getRightTriggerAxis(), ControllerConstants.DEADBAND) -
+        // MathUtil.applyDeadband(copilot.getLeftTriggerAxis(), ControllerConstants.DEADBAND)));
+
+    }
+
+    @Override
+    protected void configureSystemTests() {
+        SystemTest.registerTest("fl drive test",
+                new DriveTrainSystemTest(drivetrain, drivetrain.getFrontLeftModule(), 0.25));
+        SystemTest.registerTest("fr drive test",
+                new DriveTrainSystemTest(drivetrain, drivetrain.getFrontRightModule(), 0.25));
+        SystemTest.registerTest("bl drive test",
+                new DriveTrainSystemTest(drivetrain, drivetrain.getBackLeftModule(), 0.25));
+        SystemTest.registerTest("br drive test",
+                new DriveTrainSystemTest(drivetrain, drivetrain.getBackRightModule(), 0.25));
+
+        SystemTest.registerTest("Collector test", new CollectorSystemTest(collector, 1d, 5500));
+    }
+
+    @Override
+    protected void releaseDefaultCommands() {}
+
+    @Override
+    protected void initializeDashboardCommands() {}
+
+    @Override
+    protected void configureFaultCodes() {}
+
+    @Override
+    protected void configureFaultMonitors() {}
+
+    @Override
+    protected AutonomousCommandFactory getCommandFactory() {
+        return autoFactory;
+    }
+
+
+    /*
+     * Hello this is your favorite programing monster
+     * 
+     * I haunt your code and your dreams, you wont sleep at night while thinking about the code
+     * issues you've been having.
+     * 
+     * have fun
+     * 
+     * bu bye >:)
+     */
+
+
+
 }
