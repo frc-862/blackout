@@ -470,7 +470,7 @@ public final class Constants {
 
         public static final HashMap<wristStates, Double> angleMap() { // TODO Get Angles
             HashMap<wristStates, Double> angleMap = new HashMap<>();
-            angleMap.put(wristStates.Ground, 0d);
+            angleMap.put(wristStates.Ground, 5d);
             angleMap.put(wristStates.Stow, 120d);
             angleMap.put(wristStates.MidCube, 30d);
             angleMap.put(wristStates.HighCube, 115d);
