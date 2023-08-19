@@ -373,15 +373,9 @@ public final class Constants {
     // Constants for autonomous
     public static final class AutonomousConstants {
         // Path planner PIDConstants
-        public static final PIDConstants DRIVE_PID_CONSTANTS = new PIDConstants(2.5, 0, 0); // Drive
-                                                                                            // velocity
-                                                                                            // PID
-                                                                                            // 10.5
-        public static final PIDConstants THETA_PID_CONSTANTS = new PIDConstants(4, 0, 0); // Rotation
-                                                                                          // PID 7
-        public static final PIDConstants POSE_PID_CONSTANTS = new PIDConstants(0, 0, 0); // X and Y
-                                                                                         // position
-                                                                                         // PID
+        public static final PIDConstants DRIVE_PID_CONSTANTS = new PIDConstants(2.5, 0, 0); // Drive velocity PID 10.5
+        public static final PIDConstants THETA_PID_CONSTANTS = new PIDConstants(4, 0, 0); // Rotation PID 7
+        public static final PIDConstants POSE_PID_CONSTANTS = new PIDConstants(0, 0, 0); // X and Y position PID
 
         // Max velocity and acceleration for the path planner
         public static final double MAX_VELOCITY = 2;
@@ -445,7 +439,7 @@ public final class Constants {
 
         public static final HashMap<wristStates, Double> angleMap() { // TODO Get Angles
             HashMap<wristStates, Double> angleMap = new HashMap<>();
-            angleMap.put(wristStates.Ground, 7d);
+            angleMap.put(wristStates.Ground, 10d);
             angleMap.put(wristStates.Stow, 120d);
             angleMap.put(wristStates.MidCube, 30d);
             angleMap.put(wristStates.HighCube, 115d);

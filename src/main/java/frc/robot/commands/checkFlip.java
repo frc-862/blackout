@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.XboxController;
@@ -12,36 +14,36 @@ import frc.robot.subsystems.Drivetrain;
 
 public class checkFlip extends CommandBase {
 	Drivetrain drivetrain;
-	XboxController driver;
+	Supplier<XboxController> driver;
 	Debouncer deb = new Debouncer(1, DebounceType.kFalling);
 
-	public checkFlip(Drivetrain drivetrain, XboxController driver) {
+	public checkFlip(Drivetrain drivetrain, Supplier<XboxController> driver) {
 		this.driver = driver;
 		this.drivetrain = drivetrain;
 	}
-	
+
 
 	// Called every time the scheduler runs while the command is scheduled.
 	@Override
 	public void execute() {
-		switch (driver.getPOV()) {
+		switch (driver.get().getPOV()) {
 			case 0:
-				if (deb.calculate(driver.getPOV() == 0)) {
+				if (deb.calculate(driver.get().getPOV() == 0)) {
 					drivetrain.flipFR();
 				}
 				break;
 			case 90:
-				if (deb.calculate(driver.getPOV() == 90)) {
+				if (deb.calculate(driver.get().getPOV() == 90)) {
 					drivetrain.flipBR();
 				}
 				break;
 			case 180:
-				if (deb.calculate(driver.getPOV() == 180)) {
+				if (deb.calculate(driver.get().getPOV() == 180)) {
 					drivetrain.flipBL();
 				}
 				break;
 			case 270:
-				if (deb.calculate(driver.getPOV() == 270)) {
+				if (deb.calculate(driver.get().getPOV() == 270)) {
 					drivetrain.flipFL();
 				}
 				break;
