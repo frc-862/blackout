@@ -40,7 +40,7 @@ public class Wrist extends SubsystemBase {
     private double PIDOutput = 0d;
     private double targetAngle;
 
-    private double ABS_OFFSET = 13d;
+    private double ABS_OFFSET = 0d;
 
     public Wrist() {
         motor = NeoConfig.createMotor(CAN.WRIST_MOTOR, WristConstants.MOTOR_INVERT, WristConstants.CURRENT_LIMIT, 
@@ -181,7 +181,7 @@ public class Wrist extends SubsystemBase {
         }
 
         if(getAbsoluteAngle() < 0) {
-            setAngle(0);
+            // setAngle(0);
         }
 
         if (getLimitSwitch()) {

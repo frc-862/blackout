@@ -84,7 +84,7 @@ public class Collector extends SubsystemBase {
                 new Pair<String, Object>("Is Stalling", (BooleanSupplier) () -> isStalling()));
     }
 
-    /**
+    /** 
      * Sets smart current limit if its different from the current smart current
      * limit
      * 

@@ -145,7 +145,7 @@ public final class Constants {
             public static final class Blackout { // TODO Need offsets
                 public static final double FRONT_LEFT_STEER_OFFSET = -Math.toRadians(257.871);
                 public static final double FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(222.012);
-                public static final double BACK_LEFT_STEER_OFFSET = -Math.toRadians(20.303);
+                public static final double BACK_LEFT_STEER_OFFSET = -Math.toRadians(129.287);
                 public static final double BACK_RIGHT_STEER_OFFSET = -Math.toRadians(63.809);
             }
         }
@@ -153,7 +153,8 @@ public final class Constants {
 
     public static final class LimelightConstants {
         public static final String FRONT_NAME = "limelight-front";
-        public static final Pose3d FRONT_POSE = new Pose3d(.1, 0.28, 0.72, new Rotation3d(0, 0, 0)); // Position on robot
+        public static final Pose3d FRONT_POSE = new Pose3d(.1, 0.28, 0.72, new Rotation3d(0, 0, 0)); // Position on
+                                                                                                     // robot
         public static final double CUBE_OFFSET = 0.0; // TODO find this value
     }
 
@@ -221,9 +222,6 @@ public final class Constants {
         public static final double DOWN_kP = 0.07d;
         public static final double DOWN_kI = 0d;
         public static final double DOWN_kD = 0d;
-
-        // Tolernace for our wrist
-        public static final double TOLERANCE = 12d;
 
         // Min/max angles in degrees
         public static final double MAX_ANGLE = 126d;
@@ -447,7 +445,7 @@ public final class Constants {
 
         public static final HashMap<wristStates, Double> angleMap() { // TODO Get Angles
             HashMap<wristStates, Double> angleMap = new HashMap<>();
-            angleMap.put(wristStates.Ground, 5d);
+            angleMap.put(wristStates.Ground, 7d);
             angleMap.put(wristStates.Stow, 120d);
             angleMap.put(wristStates.MidCube, 30d);
             angleMap.put(wristStates.HighCube, 115d);
