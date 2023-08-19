@@ -127,7 +127,8 @@ public class RobotContainer extends LightningContainer {
         // C PATHS
         autoFactory.makeTrajectory("C2[2]-M-M-H", Maps.getPathMap(drivetrain, collector, limelight, wrist), 
                 new PathConstraints(AutonomousConstants.MAX_VELOCITY, AutonomousConstants.MAX_ACCELERATION));
-
+        autoFactory.makeTrajectory("C2[3]-M-LOW", Maps.getPathMap(drivetrain, collector, limelight, wrist), 
+                new PathConstraints(AutonomousConstants.MAX_VELOCITY, AutonomousConstants.MAX_ACCELERATION));
         
         // ANYWHERE
         Autonomous.register("ruh roh flick auto", new InstantCommand()); // Emergency Auton that doesn't drive
