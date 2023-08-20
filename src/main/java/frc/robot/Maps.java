@@ -8,7 +8,7 @@ import frc.robot.Constants.CollectorConstants;
 import frc.robot.Constants.WristAngles.wristStates;
 import frc.robot.commands.AutoBalance;
 import frc.robot.commands.Collect;
-import frc.robot.commands.Score;
+import frc.robot.commands.setPoints;
 import frc.robot.subsystems.Collector;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Limelight;

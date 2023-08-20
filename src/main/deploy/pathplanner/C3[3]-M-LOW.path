@@ -78,15 +78,15 @@
     {
       "anchorPoint": {
         "x": 1.7291745853106537,
-        "y": 1.177852170254982
+        "y": 1.5
       },
       "prevControl": {
         "x": 2.9756395033474803,
-        "y": 0.9377075530185307
+        "y": 1.2598553827635486
       },
       "nextControl": {
         "x": 2.9756395033474803,
-        "y": 0.9377075530185307
+        "y": 1.2598553827635486
       },
       "holonomicAngle": 180.0,
       "isReversal": true,
@@ -95,7 +95,7 @@
       "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "Score"
+          "Score-Slow"
         ],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
@@ -132,12 +132,12 @@
     },
     {
       "anchorPoint": {
-        "x": 1.5233363419651227,
-        "y": 1.6695768626915282
+        "x": 1.25,
+        "y": 2.05
       },
       "prevControl": {
-        "x": 1.5119008840014818,
-        "y": 0.32019282298193635
+        "x": 1.2385645420363591,
+        "y": 0.7006159602904081
       },
       "nextControl": null,
       "holonomicAngle": 180.0,

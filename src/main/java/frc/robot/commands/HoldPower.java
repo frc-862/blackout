@@ -20,7 +20,6 @@ public class HoldPower extends CommandBase {
     double power = 0;
     XboxController driver;
     XboxController copilot;
-    Wrist wrist;
 
     /**
      * Creates a new Collect command
@@ -29,15 +28,13 @@ public class HoldPower extends CommandBase {
      * @param input the input speed for the collector
      * @param driver Drivers Controller
      * @param copilot Copilot Controller
-     * @param Wrist The wrist subsystem
      */
     public HoldPower(Collector collector, DoubleSupplier input, XboxController driver,
-            XboxController copilot, Wrist wrist) {
+            XboxController copilot) {
         this.collector = collector;
         this.input = input;
         this.driver = driver;
         this.copilot = copilot;
-        this.wrist = wrist;
 
         addRequirements(collector);
     }
@@ -45,7 +42,6 @@ public class HoldPower extends CommandBase {
     @Override
     public void execute() {
         if (input.getAsDouble() > 0) { // Collector collects
-            wrist.setGoalState(wristStates.Ground);
             doHoldPower = true;
             power = input.getAsDouble();
         } else if (input.getAsDouble() < 0) { // Collector spits
@@ -53,10 +49,8 @@ public class HoldPower extends CommandBase {
             // wrist.setGoalState(wristStates.Ground);
             power = input.getAsDouble();
         } else if (doHoldPower) { // Hold power if no input and last input was inwards
-            wrist.setGoalState(wristStates.Stow);
             power = CollectorConstants.HOLD_POWER;
         } else {
-            wrist.setGoalState(wristStates.Stow);
             power = 0;
         }
 

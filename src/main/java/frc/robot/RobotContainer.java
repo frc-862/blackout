@@ -22,7 +22,7 @@ import frc.robot.commands.ZeroRizz;
 import frc.robot.commands.Tests.Collector.CollectorSystemTest;
 import frc.robot.commands.Tests.Drive.DriveTrainSystemTest;
 import frc.robot.commands.HoldPower;
-import frc.robot.commands.Score;
+import frc.robot.commands.setPoints;
 import frc.robot.subsystems.Drivetrain;
 import frc.thunder.LightningContainer;
 import frc.robot.Constants.LimelightConstants;
@@ -94,10 +94,10 @@ public class RobotContainer extends LightningContainer {
                 /* copilot controls */
 
                 // SETPOINTS
-                new Trigger(copilot::getAButton).whileTrue(new Score(collector, wrist, () -> wristStates.Ground));
-                new Trigger(copilot::getBButton).onTrue(new InstantCommand(() -> wrist.setGoalState(wristStates.Stow), wrist));
-                new Trigger(copilot::getXButton).whileTrue(new Score(collector, wrist, () -> wristStates.MidCube));
-                new Trigger(copilot::getYButton).whileTrue(new Score(collector, wrist, () -> wristStates.HighCube));
+                new Trigger(copilot::getAButton).whileTrue(new setPoints(wrist, () -> wristStates.Ground));
+                new Trigger(copilot::getBButton).onTrue(new InstantCommand(() -> wrist.setGoalState(wristStates.Stow)));
+                new Trigger(copilot::getXButton).whileTrue(new setPoints(wrist, () -> wristStates.MidCube));
+                new Trigger(copilot::getYButton).whileTrue(new setPoints(wrist, () -> wristStates.HighCube));
 
                 // new Trigger(copilot::getRightBumper).whileTrue(new InstantCommand(() ->
                 // collector.setPercentPower(copilot.getRightTriggerAxis()))).onFalse(new
@@ -140,7 +140,7 @@ public class RobotContainer extends LightningContainer {
                         new PathConstraints(AutonomousConstants.MAX_VELOCITY, AutonomousConstants.MAX_ACCELERATION));
                 // C PATHS
                 autoFactory.makeTrajectory("C3[3]-M-LOW", Maps.getPathMap(drivetrain, collector, limelight, wrist),
-                        new PathConstraints(3, 2));
+                        new PathConstraints(3, 2.5));
 
                 // ANYWHERE
                 Autonomous.register("ruh roh flick auto", new InstantCommand()); // Emergency Auton that doesn't drive
@@ -165,10 +165,8 @@ public class RobotContainer extends LightningContainer {
 
                 collector.setDefaultCommand(new HoldPower(collector,
                                 () -> MathUtil.applyDeadband(copilot.getRightTriggerAxis(),
-                                                ControllerConstants.DEADBAND)
-                                                - MathUtil.applyDeadband(copilot.getLeftTriggerAxis(),
-                                                                ControllerConstants.DEADBAND),
-                                driver, copilot, wrist));
+                                ControllerConstants.DEADBAND) - MathUtil.applyDeadband(copilot.getLeftTriggerAxis(),
+                                ControllerConstants.DEADBAND), driver, copilot));
 
                 // wrist.setDefaultCommand(new ZeroWrist(wrist)); //TOOD: test```
 

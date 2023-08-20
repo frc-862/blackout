@@ -178,7 +178,7 @@ public final class Constants {
 
         public static final int CURRENT_LIMIT = 0; // :P
 
-        public static final double HOLD_POWER = 0.10;
+        public static final double HOLD_POWER = 0.05;
         public static final MotorType MOTOR_TYPE = MotorType.kBrushless;
         public static final IdleMode IDLE_MODE = IdleMode.kBrake;
 
@@ -215,7 +215,7 @@ public final class Constants {
         public static final double WRIST_TOLERANCE = 4d;
 
         // PID gains for our wrist going up and down
-        public static final double UP_kP = 0.07d;
+        public static final double UP_kP = 0.15d;
         public static final double UP_kI = 0.0d;
         public static final double UP_kD = 0.000d;
 
@@ -224,7 +224,7 @@ public final class Constants {
         public static final double DOWN_kD = 0d;
 
         // Min/max angles in degrees
-        public static final double MAX_ANGLE = 126d;
+        public static final double MAX_ANGLE = 135d;
         public static final double MIN_ANGLE = 0;
 
         // Min and Max power
@@ -437,16 +437,16 @@ public final class Constants {
 
     public static final class WristAngles {
 
-        public static final HashMap<wristStates, Double> angleMap() { // TODO Get Angles
+        public static final HashMap<wristStates, Double> angleMap() { // TODO TEST
             HashMap<wristStates, Double> angleMap = new HashMap<>();
-            angleMap.put(wristStates.Ground, 10d);
-            angleMap.put(wristStates.Stow, 120d);
-            angleMap.put(wristStates.MidCube, 30d);
+            angleMap.put(wristStates.Ground, 7d);
+            angleMap.put(wristStates.Stow, 125d);
+            angleMap.put(wristStates.MidCube, 90d);
             angleMap.put(wristStates.HighCube, 115d);
             return angleMap;
         }
 
-        public static final HashMap<wristStates, Double> shootMap() { // TODO Get Speeds
+        public static final HashMap<wristStates, Double> shootMap() { // TODO NOT USED
             HashMap<wristStates, Double> shootMap = new HashMap<>();
             shootMap.put(wristStates.Stow, CollectorConstants.HOLD_POWER);
             shootMap.put(wristStates.Ground, -0.25);
