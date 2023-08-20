@@ -224,7 +224,7 @@ public final class Constants {
         public static final double DOWN_kD = 0d;
 
         // Min/max angles in degrees
-        public static final double MAX_ANGLE = 135d;
+        public static final double MAX_ANGLE = 118d;
         public static final double MIN_ANGLE = 0;
 
         // Min and Max power
@@ -439,12 +439,12 @@ public final class Constants {
 
         public static final HashMap<wristStates, Double> angleMap() { // TODO TEST
             HashMap<wristStates, Double> angleMap = new HashMap<>();
-            angleMap.put(wristStates.Ground, 7d);
-            angleMap.put(wristStates.Stow, 125d);
-            angleMap.put(wristStates.MidCube, 90d);
+            angleMap.put(wristStates.Ground, 3d);
+            angleMap.put(wristStates.Stow, 118d);
+            angleMap.put(wristStates.MidCube, 70d);
             angleMap.put(wristStates.HighCube, 115d);
             return angleMap;
-        }
+        } 
 
         public static final HashMap<wristStates, Double> shootMap() { // TODO NOT USED
             HashMap<wristStates, Double> shootMap = new HashMap<>();

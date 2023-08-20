@@ -34,7 +34,6 @@ public class Maps {
         // SET Positions TODO Change to Score command?
         eventMap.put("Ground-Collect", new InstantCommand(() -> wrist.setGoalState(wristStates.Ground)));
         eventMap.put("Mid-Score", new InstantCommand(() -> wrist.setGoalState(wristStates.MidCube)));
-        eventMap.put("High-Score", new InstantCommand(() -> wrist.setGoalState(wristStates.HighCube)));
         eventMap.put("Stow", new InstantCommand(() -> wrist.setGoalState(wristStates.Stow)));
 
         // COLLECTOR actions

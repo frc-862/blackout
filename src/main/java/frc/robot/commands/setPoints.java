@@ -17,6 +17,8 @@ public class setPoints extends CommandBase {
 	public setPoints(Wrist wrist, Supplier<wristStates> targetState) {
 		this.wrist = wrist;
 		this.targetState = targetState;
+
+		addRequirements(wrist);
 	}
 
 	// Called when the command is initially scheduled.

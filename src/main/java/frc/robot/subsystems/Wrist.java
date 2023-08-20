@@ -71,10 +71,11 @@ public class Wrist extends SubsystemBase {
      * @return Rotation2d of the wrist from encoder
      */
     public Rotation2d getAngle() { // TODO FIX CONVERSION factor
-        return Rotation2d.fromDegrees(motor.getEncoder().getPosition() * WristConstants.POSITION_CONVERSION_FACTOR/*
-                                                                                                                   * +
+        return Rotation2d.fromDegrees(motor.getEncoder().getPosition() * WristConstants.POSITION_CONVERSION_FACTOR/**
+                                                                                                                   * +*
                                                                                                                    * OFFSET
-                                                                                                                   */);
+                                                                                                                   */
+        );
     }
 
     public void disableWrist() {
@@ -148,9 +149,9 @@ public class Wrist extends SubsystemBase {
     public void periodic() {
         if (currState != goalState) {
             setTargetAngle(WristAngles.angleMap().get(goalState));
-            if (onTarget()) {
+            // if (onTarget()) {
                 currState = goalState;
-            }
+            // }
         }
 
         upController.setP(LightningShuffleboard.getDouble("Wrist", "UP_kP", WristConstants.UP_kP));
@@ -179,7 +180,7 @@ public class Wrist extends SubsystemBase {
             // stop();
         }
 
-        if (getAbsoluteAngle() < 0) {
+        if (getAbsoluteAngle() < -1.5) {
             setAngle(0);
         }
 

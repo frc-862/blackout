@@ -95,7 +95,7 @@ public class RobotContainer extends LightningContainer {
 
                 // SETPOINTS
                 new Trigger(copilot::getAButton).whileTrue(new setPoints(wrist, () -> wristStates.Ground));
-                new Trigger(copilot::getBButton).onTrue(new InstantCommand(() -> wrist.setGoalState(wristStates.Stow)));
+                new Trigger(copilot::getBButton).whileTrue(new setPoints(wrist, () -> wristStates.Stow));
                 new Trigger(copilot::getXButton).whileTrue(new setPoints(wrist, () -> wristStates.MidCube));
                 new Trigger(copilot::getYButton).whileTrue(new setPoints(wrist, () -> wristStates.HighCube));
 
