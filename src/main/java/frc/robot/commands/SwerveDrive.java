@@ -2,13 +2,16 @@ package frc.robot.commands;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.subsystems.Drivetrain;
 
@@ -46,6 +49,9 @@ public class SwerveDrive extends CommandBase {
         this.m_rotationSupplier = rotationSupplier;
         this.slowMode = slowMode;
         this.robotCentric = robotCentric;
+
+        // CommandScheduler.getInstance().schedule(new checkFlip(drivetrainSubsystem, driver));
+
 
         addRequirements(drivetrainSubsystem);
     }

@@ -30,7 +30,9 @@ public class Collector extends SubsystemBase {
 
     private GamePiece gamePiece = GamePiece.CUBE;
 
-    // private PIDController PIDController = new PIDController(CollectorConstants.MOTOR_kP, CollectorConstants.MOTOR_kI, CollectorConstants.MOTOR_kD);
+    // private PIDController PIDController = new
+    // PIDController(CollectorConstants.MOTOR_kP, CollectorConstants.MOTOR_kI,
+    // CollectorConstants.MOTOR_kD);
     // private double kS = CollectorConstants.MOTOR_kS;
     // private double kV = CollectorConstants.MOTOR_kV;
 
@@ -38,11 +40,12 @@ public class Collector extends SubsystemBase {
 
     public Collector() {
         // Create the motor and configure it
-        motor = NeoConfig.createMotor(CAN.COLLECTOR_MOTOR, CollectorConstants.MOTOR_INVERT, CollectorConstants.CURRENT_LIMIT,
-            Constants.VOLTAGE_COMPENSATION, CollectorConstants.MOTOR_TYPE, CollectorConstants.IDLE_MODE);
+        motor = NeoConfig.createMotor(CAN.COLLECTOR_MOTOR, CollectorConstants.MOTOR_INVERT,
+                CollectorConstants.CURRENT_LIMIT,
+                Constants.VOLTAGE_COMPENSATION, CollectorConstants.MOTOR_TYPE, CollectorConstants.IDLE_MODE);
 
         // PIDController.setTolerance(50);
-        
+
         // Initialize the shuffleboard values and start logging data
         initialiizeShuffleboard();
 
@@ -52,6 +55,7 @@ public class Collector extends SubsystemBase {
     /**
      * Sets the power of the collector motors
      * -1.0 <> 1.0
+     * 
      * @param power the percent speed to set the collector motors to
      */
     public void setPercentPower(double power) {
@@ -64,31 +68,34 @@ public class Collector extends SubsystemBase {
      * @param RPM the velocity to set the collector motors to in RPM
      */
     // public void setRPM(double RPM) {
-    //     MathUtil.clamp(RPM, -CollectorConstants.MAX_RPM, CollectorConstants.MAX_RPM);
-    //     motor.setVoltage(PIDController.calculate(motor.getEncoder().getVelocity(), RPM));
+    // MathUtil.clamp(RPM, -CollectorConstants.MAX_RPM, CollectorConstants.MAX_RPM);
+    // motor.setVoltage(PIDController.calculate(motor.getEncoder().getVelocity(),
+    // RPM));
     // }
 
     // Method to start logging
     @SuppressWarnings("unchecked")
     private void initialiizeShuffleboard() {
         periodicShuffleboard = new LightningShuffleboardPeriodic("Collector", CollectorConstants.LOG_PERIOD,
-            new Pair<String, Object>("Collector motor output percent", (DoubleSupplier) () -> motor.get()),
-            new Pair<String, Object>("Collector RPM", (DoubleSupplier) () -> getCurrentRPM()),
-            new Pair<String, Object>("Is Stalling", (BooleanSupplier) () -> isStalling()));
+                new Pair<String, Object>("Collector motor output current",
+                        (DoubleSupplier) () -> motor.getOutputCurrent()),
+                new Pair<String, Object>("Collector RPM", (DoubleSupplier) () -> getCurrentRPM()),
+                // new Pair<String, Object>("Collector output Percent",
+                new Pair<String, Object>("Is Stalling", (BooleanSupplier) () -> isStalling()));
     }
 
-    /**
-     * Sets smart current limit if its different from the current smart current limit
+    /** 
+     * Sets smart current limit if its different from the current smart current
+     * limit
      * 
      * @param currentLimit the new smart current limit
      */
     public void setCurrentLimit(int currentLimit) {
-        if(currCurrentLimit != currentLimit) {
+        if (currCurrentLimit != currentLimit) {
             motor.setSmartCurrentLimit(currentLimit);
             currCurrentLimit = currentLimit;
         }
     }
-
 
     /**
      * Returns true if the collector is stalling
@@ -100,7 +107,8 @@ public class Collector extends SubsystemBase {
     /**
      * Gets the game piece detected by the color sensor
      * 
-     * @return the game piece detected by the color sensor (Either CUBE, CONE, or NONE)
+     * @return the game piece detected by the color sensor (Either CUBE, CONE, or
+     *         NONE)
      */
     public GamePiece getGamePiece() {
         return gamePiece;
@@ -121,11 +129,12 @@ public class Collector extends SubsystemBase {
 
     /**
      * gets current RPM from internal encoders
+     * 
      * @return average RPM of collector
      */
     public double getCurrentRPM() {
-		return motor.getEncoder().getVelocity();
-	}
+        return motor.getEncoder().getVelocity();
+    }
 
     /**
      * stop Sets the power of the collector motor to 0
@@ -139,20 +148,23 @@ public class Collector extends SubsystemBase {
 
         periodicShuffleboard.loop();
 
-        // PIDController.setP(LightningShuffleboard.getDouble("Collector", "kP", CollectorConstants.MOTOR_kP));
-        // PIDController.setI(LightningShuffleboard.getDouble("Collector", "kI", CollectorConstants.MOTOR_kI));
-        // PIDController.setD(LightningShuffleboard.getDouble("Collector", "kD", CollectorConstants.MOTOR_kD));
+        // PIDController.setP(LightningShuffleboard.getDouble("Collector", "kP",
+        // CollectorConstants.MOTOR_kP));
+        // PIDController.setI(LightningShuffleboard.getDouble("Collector", "kI",
+        // CollectorConstants.MOTOR_kI));
+        // PIDController.setD(LightningShuffleboard.getDouble("Collector", "kD",
+        // CollectorConstants.MOTOR_kD));
 
-        // kS = LightningShuffleboard.getDouble("Collector", "kS", CollectorConstants.MOTOR_kS);
-        // kV = LightningShuffleboard.getDouble("Collector", "kV", CollectorConstants.MOTOR_kV);
-
+        // kS = LightningShuffleboard.getDouble("Collector", "kS",
+        // CollectorConstants.MOTOR_kS);
+        // kV = LightningShuffleboard.getDouble("Collector", "kV",
+        // CollectorConstants.MOTOR_kV);
 
         // double FFOutput = kS * Math.signum(getCurrentRPM()) + kV * getCurrentRPM();
 
-
         LightningShuffleboard.setDouble("Collector", "Collector Amps", motor.getAppliedOutput());
         LightningShuffleboard.setDouble("Collector", "RPM", getCurrentRPM());
-        // LightningShuffleboard.setDouble("Collector", "Commanded Power", motor.get());
+        LightningShuffleboard.setDouble("Collector", "Commanded Power", motor.get());
 
         // LightningShuffleboard.setDouble("Colletor", "",motor. );
 

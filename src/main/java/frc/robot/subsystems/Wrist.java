@@ -18,20 +18,21 @@ import frc.robot.Constants.WristConstants;
 import frc.thunder.config.NeoConfig;
 import frc.thunder.shuffleboard.LightningShuffleboard;
 
-
 /** Add your docs here. */
 public class Wrist extends SubsystemBase {
 
-    
     private CANSparkMax motor;
 
     wristStates currState = wristStates.Stow;
     wristStates goalState = wristStates.Stow;
 
-    private PIDController upController = new PIDController(WristConstants.UP_kP, WristConstants.UP_kI, WristConstants.UP_kD);
-    private PIDController downController = new PIDController(WristConstants.DOWN_kP, WristConstants.DOWN_kI, WristConstants.DOWN_kD);
+    private PIDController upController = new PIDController(WristConstants.UP_kP, WristConstants.UP_kI,
+            WristConstants.UP_kD);
+    private PIDController downController = new PIDController(WristConstants.DOWN_kP, WristConstants.DOWN_kI,
+            WristConstants.DOWN_kD);
 
-    // private Encoder encoder = new Encoder(0, 0, 0, WristConstants.ENCODER_INVERT);
+    // private Encoder encoder = new Encoder(0, 0, 0,
+    // WristConstants.ENCODER_INVERT);
     private DutyCycleEncoder encoder = new DutyCycleEncoder(0);
 
     private boolean disableWrist = false;
@@ -40,15 +41,14 @@ public class Wrist extends SubsystemBase {
     private double PIDOutput = 0d;
     private double targetAngle;
 
-    private double ABS_OFFSET = 13d;
+    private double ABS_OFFSET = 180.9d;
 
     public Wrist() {
-        motor = NeoConfig.createMotor(CAN.WRIST_MOTOR, WristConstants.MOTOR_INVERT, WristConstants.CURRENT_LIMIT, 
-            Constants.VOLTAGE_COMPENSATION, WristConstants.MOTOR_TYPE, WristConstants.IDLE_MODE);
+        motor = NeoConfig.createMotor(CAN.WRIST_MOTOR, WristConstants.MOTOR_INVERT, WristConstants.CURRENT_LIMIT,
+                Constants.VOLTAGE_COMPENSATION, WristConstants.MOTOR_TYPE, WristConstants.IDLE_MODE);
 
         // Channel 0 is up
         // Channel 1 is down
-
 
         setTargetAngle(WristAngles.angleMap().get(goalState));
 
@@ -61,20 +61,23 @@ public class Wrist extends SubsystemBase {
 
     }
 
-    
     public void setTargetAngle(double angle) {
         targetAngle = MathUtil.clamp(angle, WristConstants.MIN_ANGLE, WristConstants.MAX_ANGLE);
     }
-    
+
     /**
      * Gets the angle of the wrist from the encoder
      * 
      * @return Rotation2d of the wrist from encoder
      */
-    public Rotation2d getAngle() { //TODO FIX CONVERSION factor
-        return Rotation2d.fromDegrees(motor.getEncoder().getPosition() * WristConstants.POSITION_CONVERSION_FACTOR/* + OFFSET*/);
+    public Rotation2d getAngle() { // TODO FIX CONVERSION factor
+        return Rotation2d.fromDegrees(motor.getEncoder().getPosition() * WristConstants.POSITION_CONVERSION_FACTOR/**
+                                                                                                                   * +*
+                                                                                                                   * OFFSET
+                                                                                                                   */
+        );
     }
-    
+
     public void disableWrist() {
         stop();
         disableWrist = true;
@@ -83,9 +86,10 @@ public class Wrist extends SubsystemBase {
     public void enableWrist() {
         disableWrist = false;
     }
-    
+
     /**
      * Set power to both motors
+     * 
      * @param power sets power from percent output
      */
     public void setPower(double power) {
@@ -99,11 +103,11 @@ public class Wrist extends SubsystemBase {
     public void setGoalState(wristStates goalState) {
         this.goalState = goalState;
     }
-    
+
     public wristStates getCurrState() {
         return currState;
     }
-    
+
     public wristStates getGoalState() {
         return goalState;
     }
@@ -116,13 +120,13 @@ public class Wrist extends SubsystemBase {
         setTargetAngle(getAngle().getDegrees() + bias);
     }
 
-    public boolean isStalling(){
+    public boolean isStalling() {
         return motor.getOutputCurrent() >= WristConstants.STALL_CURRENT;
     }
 
     public boolean isMoving() {
         return Math.abs(motor.getEncoder().getVelocity()) >= WristConstants.IS_MOVING_THRESHHOLD;
-        
+
     }
 
     public boolean getLimitSwitch() {
@@ -145,11 +149,10 @@ public class Wrist extends SubsystemBase {
     public void periodic() {
         if (currState != goalState) {
             setTargetAngle(WristAngles.angleMap().get(goalState));
-            if(onTarget()) {
+            // if (onTarget()) {
                 currState = goalState;
-            }
+            // }
         }
-        
 
         upController.setP(LightningShuffleboard.getDouble("Wrist", "UP_kP", WristConstants.UP_kP));
         upController.setI(LightningShuffleboard.getDouble("Wrist", "UP_kI", WristConstants.UP_kI));
@@ -162,8 +165,6 @@ public class Wrist extends SubsystemBase {
         LightningShuffleboard.setString("Wrist", "Goal State", getGoalState().toString());
         LightningShuffleboard.setString("Wrist", "Current State", getCurrState().toString());
         LightningShuffleboard.setDouble("Wrist", "Target Angle", WristAngles.angleMap().get(goalState));
-        
-
 
         if (targetAngle - getAngle().getDegrees() > 0) {
             PIDOutput = upController.calculate(getAngle().getDegrees(), targetAngle);
@@ -173,14 +174,13 @@ public class Wrist extends SubsystemBase {
 
         LightningShuffleboard.setDouble("Wrist", "Power Output", PIDOutput);
 
-
-        if(!disableWrist){
+        if (!disableWrist) {
             setPower(PIDOutput);
         } else {
             // stop();
         }
 
-        if(getAbsoluteAngle() < 0) {
+        if (getAbsoluteAngle() < -1.5) {
             setAngle(0);
         }
 
@@ -191,4 +191,4 @@ public class Wrist extends SubsystemBase {
             setAngle(WristConstants.MAX_ANGLE);
         }
     }
-}   
+}
